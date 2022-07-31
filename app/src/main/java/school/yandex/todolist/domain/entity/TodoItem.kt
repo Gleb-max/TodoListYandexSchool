@@ -10,4 +10,10 @@ data class TodoItem(
     val isDone: Boolean,
     val createdAt: Date,
     val lastUpdatedBy: Date?,
-)
+) {
+
+    companion object {
+
+        const val UNDEFINED_ID = ""
+    }
+}

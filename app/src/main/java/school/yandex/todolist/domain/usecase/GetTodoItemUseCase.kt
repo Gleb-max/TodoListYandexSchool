@@ -4,5 +4,5 @@ import school.yandex.todolist.domain.repository.TodoItemsRepository
 
 class GetTodoItemUseCase(private val repository: TodoItemsRepository) {
 
-    suspend operator fun invoke(todoItemId: Int) = repository.getTodoItem(todoItemId)
+    suspend operator fun invoke(todoItemId: String) = repository.getTodoItem(todoItemId)
 }
