@@ -5,13 +5,13 @@ import school.yandex.todolist.domain.entity.TodoItem
 
 interface TodoItemsRepository {
 
-    suspend fun getTodoList(): LiveData<List<TodoItem>>
+    fun getTodoList(): LiveData<List<TodoItem>>
 
-    suspend fun getTodoItem(todoItemId: String): TodoItem
+    fun getTodoItem(todoItemId: String): TodoItem
 
-    suspend fun addTodoItem(todoItem: TodoItem)
+    fun addTodoItem(todoItem: TodoItem)
 
-    suspend fun editTodoItem(todoItem: TodoItem)
+    fun editTodoItem(todoItem: TodoItem)
 
-    suspend fun deleteTodoItem(todoItem: TodoItem)
+    fun deleteTodoItem(todoItem: TodoItem)
 }

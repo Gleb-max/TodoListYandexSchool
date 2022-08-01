@@ -6,5 +6,5 @@ import school.yandex.todolist.domain.repository.TodoItemsRepository
 
 class GetTodoListUseCase(private val repository: TodoItemsRepository) {
 
-    suspend operator fun invoke(): LiveData<List<TodoItem>> = repository.getTodoList()
+    operator fun invoke(): LiveData<List<TodoItem>> = repository.getTodoList()
 }

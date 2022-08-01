@@ -1,35 +1,40 @@
 package school.yandex.todolist.data.repository
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import school.yandex.todolist.data.repository.mock.TodoMock
 import school.yandex.todolist.domain.entity.TodoItem
 import school.yandex.todolist.domain.repository.TodoItemsRepository
-import java.lang.RuntimeException
 
 class TodoItemsRepositoryImpl : TodoItemsRepository {
 
     private val todoListLD = MutableLiveData<List<TodoItem>>()
-    private val todoList = sortedSetOf<TodoItem>({ o1, o2 -> o1.createdAt.compareTo(o2.createdAt) })
+    private val todoList = sortedSetOf<TodoItem>(
+        { o1, o2 -> o1.id.toInt().compareTo(o2.id.toInt()) }
+    )
 
     private var autoIncrementId = 0
 
     init {
 
-        todoList.addAll(TodoMock.todoList)
+        TodoMock.todoList.forEach {
+            addTodoItem(it)
+        }
+        autoIncrementId = todoList.last().id.toInt() + 1
     }
 
-    override suspend fun getTodoList(): LiveData<List<TodoItem>> {
+    override fun getTodoList(): LiveData<List<TodoItem>> {
         return todoListLD
     }
 
-    override suspend fun getTodoItem(todoItemId: String): TodoItem {
+    override fun getTodoItem(todoItemId: String): TodoItem {
         return todoList.find {
             it.id == todoItemId
         } ?: throw RuntimeException("Element with id $todoItemId not found")
     }
 
-    override suspend fun addTodoItem(todoItem: TodoItem) {
+    override fun addTodoItem(todoItem: TodoItem) {
         val item = if (todoItem.id == TodoItem.UNDEFINED_ID) {
             todoItem.copy(id = autoIncrementId++.toString())
         } else todoItem
@@ -37,13 +42,13 @@ class TodoItemsRepositoryImpl : TodoItemsRepository {
         updateList()
     }
 
-    override suspend fun editTodoItem(todoItem: TodoItem) {
+    override fun editTodoItem(todoItem: TodoItem) {
         val oldElement = getTodoItem(todoItem.id)
         todoList.remove(oldElement)
         addTodoItem(todoItem)
     }
 
-    override suspend fun deleteTodoItem(todoItem: TodoItem) {
+    override fun deleteTodoItem(todoItem: TodoItem) {
         todoList.remove(todoItem)
         updateList()
     }
