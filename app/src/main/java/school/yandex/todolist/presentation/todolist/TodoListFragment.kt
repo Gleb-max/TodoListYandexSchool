@@ -3,20 +3,26 @@ package school.yandex.todolist.presentation.todolist
 import android.content.Context
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.snackbar.Snackbar
 import school.yandex.todolist.R
 import school.yandex.todolist.databinding.FragmentTodoListBinding
 import school.yandex.todolist.domain.entity.TodoItem
 import school.yandex.todolist.presentation.TodoListAdapter
+import kotlin.math.abs
 
 class TodoListFragment : Fragment() {
 
@@ -50,11 +56,12 @@ class TodoListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         observeViewModel()
-        (activity as AppCompatActivity).setSupportActionBar(binding.toolbar)
+
         binding.fab.setOnClickListener {
             onTodoListActionsListener.onAddTodoItem()
         }
 
+        setupAppBar()
         setupRecyclerView()
     }
 
@@ -66,7 +73,30 @@ class TodoListFragment : Fragment() {
     private fun observeViewModel() {
         viewModel.todoList.observe(viewLifecycleOwner) {
             todoListAdapter.submitList(it)
+
+            val doneCount = it.count { item -> item.isDone }
+            binding.tvDoneCount.text = getString(R.string.items_done_subtitle, doneCount)
         }
+    }
+
+    private fun setupAppBar() {
+        // todo переделать покрасивше + использовать margin в dp из ресурсов
+        binding.appBar.addOnOffsetChangedListener(
+            AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
+                val layoutParams = FrameLayout.LayoutParams(
+                    binding.ibTodoVisibility.layoutParams
+                )
+                layoutParams.gravity = Gravity.CENTER_VERTICAL or Gravity.END
+                if (abs(verticalOffset) <= appBarLayout.totalScrollRange / 2) {
+                    binding.tvDoneCount.visibility = View.VISIBLE
+                    layoutParams.bottomMargin = 0
+                } else {
+                    binding.tvDoneCount.visibility = View.GONE
+                    layoutParams.bottomMargin = 16
+                }
+                binding.ibTodoVisibility.layoutParams = layoutParams
+            }
+        )
     }
 
     private fun setupRecyclerView() {

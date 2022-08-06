@@ -13,7 +13,7 @@ import java.util.*
 
 class TodoItemViewModel : ViewModel() {
 
-    // add di to pass usecases as parameters
+    //todo: add di to pass usecases as parameters
     private val repository = TodoItemsRepositoryImpl()
     private val getTodoListUseCase = GetTodoListUseCase(repository)
     private val getTodoItemUseCase = GetTodoItemUseCase(repository)
@@ -21,21 +21,22 @@ class TodoItemViewModel : ViewModel() {
     private val editTodoItemUseCase = EditTodoItemUseCase(repository)
     private val deleteTodoItemUseCase = DeleteTodoItemUseCase(repository)
 
-    private val _todoItem = MutableLiveData<TodoItem>()
-    val todoItem: LiveData<TodoItem>
-        get() = _todoItem
+    private val _todoItemDraft = MutableLiveData<TodoItemDraft?>()
+    val todoItemDraft: LiveData<TodoItemDraft?>
+        get() = _todoItemDraft
 
     fun getTodoItem(todoItemId: String) {
         viewModelScope.launch {
             val item = getTodoItemUseCase(todoItemId)
-            _todoItem.value = item
+            if (item != null) _todoItemDraft.value = TodoItemDraft.fromEntity(item)
+            else TODO("add logic when item is null (error / pop back / ...)")
         }
     }
 
     fun deleteTodoItem() {
-        viewModelScope.launch {
-            _todoItem.value?.let { deleteTodoItemUseCase(it) }
-        }
+//        viewModelScope.launch {
+//            _todoItem.value?.let { deleteTodoItemUseCase(it) }
+//        }
     }
 
     fun addTodoItem(content: String, importance: TodoItemImportance, deadline: Date) {
@@ -53,15 +54,15 @@ class TodoItemViewModel : ViewModel() {
     }
 
     fun editTodoItem(content: String, importance: TodoItemImportance, deadline: Date) {
-        _todoItem.value?.let {
-            editTodoItemUseCase(
-                it.copy(
-                    content = content,
-                    importance = importance,
-                    deadline = deadline,
-                    lastUpdatedBy = Calendar.getInstance().time
-                )
-            )
-        }
+//        _todoItem.value?.let {
+//            editTodoItemUseCase(
+//                it.copy(
+//                    content = content,
+//                    importance = importance,
+//                    deadline = deadline,
+//                    lastUpdatedBy = Calendar.getInstance().time
+//                )
+//            )
+//        }
     }
 }

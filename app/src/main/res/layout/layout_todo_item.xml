@@ -35,6 +35,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:background="@null"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
             android:paddingHorizontal="14dp"
             app:layout_constraintBottom_toBottomOf="@id/checkbox"
             app:layout_constraintEnd_toEndOf="parent"
@@ -56,7 +57,7 @@
             app:layout_constraintEnd_toStartOf="@id/ib_info"
             app:layout_constraintStart_toEndOf="@id/iv_priority"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="Купить что-то, где-то, зачем-то, но зачем не очень понятно, но точно чтобы показать как обр…" />
+            tools:text="Купить что-то, где-то, зачем-то, но зачем не очень понятно, но точно чтобы показать как обрезается длинный очень длинный текст" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/tv_date"

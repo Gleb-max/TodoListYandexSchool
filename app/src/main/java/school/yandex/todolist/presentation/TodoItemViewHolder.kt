@@ -1,10 +1,9 @@
 package school.yandex.todolist.presentation
 
-import android.content.res.ColorStateList
 import android.view.View
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import school.yandex.todolist.R
+import school.yandex.todolist.core.ext.getReadableDate
 import school.yandex.todolist.databinding.LayoutTodoItemBinding
 import school.yandex.todolist.domain.entity.TodoItem
 import school.yandex.todolist.domain.entity.TodoItemImportance
@@ -16,7 +15,7 @@ class TodoItemViewHolder(
     fun bind(todoItem: TodoItem) {
         binding.tvContent.text = todoItem.content
         binding.tvDate.visibility = if (todoItem.deadline == null) View.GONE else View.VISIBLE
-        binding.tvDate.text = todoItem.getReadableDeadline()
+        binding.tvDate.text = todoItem.deadline?.getReadableDate()
         binding.checkbox.isChecked = todoItem.isDone
 //        binding.checkbox.buttonTintList = ColorStateList.valueOf(
 //            ContextCompat.getColor(

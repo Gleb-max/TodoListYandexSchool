@@ -1,10 +1,5 @@
 <resources>
-    <string name="app_name">TodoListYandexSchool</string>
-    <string name="title_activity_main">MainActivity</string>
-    <string name="add_todo_item_content_description">Add Todo Item</string>
-    <string name="save_text">Сохранить</string>
-    <string name="importance">Важность</string>
-    <string name="delete">Удалить</string>
+    <string name="app_name">Todo List</string>
 
     <string-array name="importance_levels">
         <item>Нет</item>
@@ -12,4 +7,17 @@
         <item>Высокий</item>
     </string-array>
 
+    <string name="add_todo_item_content_description">Add Todo Item</string>
+
+    // titles
+    <string name="title_todo_list">Todo List</string>
+    <string name="title_todo_item_details">Todo Item Details</string>
+    <string name="my_tasks">Мои дела</string>
+    <string name="items_done_subtitle">Выполнено — %1$d</string>
+
+    // labels
+    <string name="choose_date_label">Выберите дату</string>
+    <string name="save_text">Сохранить</string>
+    <string name="importance">Важность</string>
+    <string name="delete">Удалить</string>
 </resources>

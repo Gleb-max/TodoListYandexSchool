@@ -21,8 +21,10 @@
             android:layout_height="match_parent"
             android:background="@color/bg"
             android:fitsSystemWindows="true"
+            app:collapsedTitleTextColor="@color/black"
             app:contentScrim="@color/bg"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:expandedTitleTextColor="@color/black"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
             app:toolbarId="@+id/toolbar">
 
             <androidx.appcompat.widget.Toolbar
@@ -30,44 +32,45 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:layout_collapseMode="pin"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
                 app:popupTheme="@style/Theme.TodoListYandexSchool.PopupOverlay"
-                app:title="Мои дела"
+                app:title="@string/my_tasks"
                 app:titleTextColor="@color/black" />
 
-<!--            <androidx.constraintlayout.widget.ConstraintLayout-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_gravity="bottom"-->
-<!--                android:paddingStart="60dp">-->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_marginTop="16dp"
+                android:paddingStart="32dp"
+                android:paddingEnd="24dp">
 
-<!--                <com.google.android.material.textview.MaterialTextView-->
-<!--                    android:id="@+id/done_count"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:fontFamily="@font/roboto_medium"-->
-<!--                    android:text="Выполнено — 5"-->
-<!--                    android:textColor="@color/gray"-->
-<!--                    android:textSize="16sp"-->
-<!--                    app:layout_constraintBottom_toBottomOf="parent"-->
-<!--                    app:layout_constraintStart_toStartOf="parent"-->
-<!--                    app:layout_constraintTop_toTopOf="parent" />-->
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/tv_done_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start|center_vertical"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textColor="@color/gray"
+                    android:textSize="16sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="Выполнено — 5" />
 
-<!--                <androidx.appcompat.widget.AppCompatImageButton-->
-<!--                    android:id="@+id/ib_todo_visibility"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_marginEnd="24dp"-->
-<!--                    android:background="@null"-->
-<!--                    android:paddingHorizontal="14dp"-->
-<!--                    app:layout_constraintBottom_toBottomOf="@id/done_count"-->
-<!--                    app:layout_constraintEnd_toEndOf="parent"-->
-<!--                    app:srcCompat="@drawable/ic_visibility"-->
-<!--                    app:tint="@color/blue" />-->
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/ib_todo_visibility"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end|center_vertical"
+                    android:background="@null"
+                    android:foreground="?attr/selectableItemBackgroundBorderless"
+                    android:padding="5dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:srcCompat="@drawable/ic_visibility"
+                    app:tint="@color/blue" />
 
-<!--            </androidx.constraintlayout.widget.ConstraintLayout>-->
+            </FrameLayout>
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
@@ -79,30 +82,46 @@
         android:layout_marginHorizontal="8dp"
         android:background="@drawable/todo_list_bg"
         android:clipToPadding="false"
-        android:elevation="6dp"
         android:fillViewport="true"
+        android:paddingTop="8dp"
         android:paddingBottom="24dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
+        <!-- все что ниже (вложенность) - для красивого списка карточек (чтобы
+            1) он был по размеру списка, если список не вылазит за экран и
+            2) чтобы края списка были круглыми как по дизу
+         ) -->
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:context=".presentation.todolist.TodoListFragment">
+            android:layout_height="wrap_content">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_todo_list"
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:clipToPadding="false"
-                android:nestedScrollingEnabled="true"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="2dp"
+                app:cardUseCompatPadding="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:itemCount="20"
-                tools:listitem="@layout/layout_todo_item" />
+                app:layout_constraintTop_toTopOf="parent">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_todo_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:nestedScrollingEnabled="true"
+                    android:overScrollMode="never"
+                    android:scrollIndicators="none"
+                    android:scrollbars="none"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:itemCount="2"
+                    tools:listitem="@layout/layout_todo_item" />
+            </com.google.android.material.card.MaterialCardView>
         </androidx.constraintlayout.widget.ConstraintLayout>
+
     </androidx.core.widget.NestedScrollView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

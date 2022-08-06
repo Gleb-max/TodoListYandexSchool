@@ -7,7 +7,7 @@ interface TodoItemsRepository {
 
     fun getTodoList(): LiveData<List<TodoItem>>
 
-    fun getTodoItem(todoItemId: String): TodoItem
+    fun getTodoItem(todoItemId: String): TodoItem?
 
     fun addTodoItem(todoItem: TodoItem)
 

@@ -1,6 +1,5 @@
 package school.yandex.todolist.data.repository
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import school.yandex.todolist.data.repository.mock.TodoMock
@@ -28,10 +27,10 @@ class TodoItemsRepositoryImpl : TodoItemsRepository {
         return todoListLD
     }
 
-    override fun getTodoItem(todoItemId: String): TodoItem {
+    override fun getTodoItem(todoItemId: String): TodoItem? {
         return todoList.find {
             it.id == todoItemId
-        } ?: throw RuntimeException("Element with id $todoItemId not found")
+        }
     }
 
     override fun addTodoItem(todoItem: TodoItem) {
