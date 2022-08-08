@@ -9,7 +9,7 @@ data class TodoItem(
     val deadline: Date?,
     val isDone: Boolean,
     val createdAt: Date,
-    val lastUpdatedBy: Date?,
+    val changedAt: Date?,
 ) {
 
     companion object {

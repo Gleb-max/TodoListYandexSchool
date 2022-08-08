@@ -1,4 +1,4 @@
-package school.yandex.todolist.presentation
+package school.yandex.todolist.presentation.todolist.adapter
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView

@@ -1,58 +1,43 @@
 package school.yandex.todolist.data.repository
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import school.yandex.todolist.data.repository.mock.TodoMock
+import school.yandex.todolist.data.repository.local.RevisionPreferences
+import school.yandex.todolist.data.repository.mapper.TodoListMapper
+import school.yandex.todolist.data.repository.remote.api.TodoApi
 import school.yandex.todolist.domain.entity.TodoItem
 import school.yandex.todolist.domain.repository.TodoItemsRepository
 
-class TodoItemsRepositoryImpl : TodoItemsRepository {
+//todo: add local data source to constructor
+class TodoItemsRepositoryImpl(
+    private val remote: TodoApi,
+    private val revisionPreferences: RevisionPreferences
+) : TodoItemsRepository {
 
-    private val todoListLD = MutableLiveData<List<TodoItem>>()
-    private val todoList = sortedSetOf<TodoItem>(
-        { o1, o2 -> o1.id.toInt().compareTo(o2.id.toInt()) }
-    )
+    private val mapper = TodoListMapper()
 
-    private var autoIncrementId = 0
-
-    init {
-
-        TodoMock.todoList.forEach {
-            addTodoItem(it)
-        }
-        autoIncrementId = todoList.last().id.toInt() + 1
+    override suspend fun getTodoList(): List<TodoItem> {
+        val todoListResponse = remote.fetchTodoList()
+        val lastRevision = todoListResponse.revision
+        revisionPreferences.setRevision(lastRevision)
+        return mapper.mapListDTOToListEntity(todoListResponse.todoItems)
     }
 
-    override fun getTodoList(): LiveData<List<TodoItem>> {
-        return todoListLD
+    override suspend fun getTodoItem(todoItemId: String): TodoItem {
+        val todoItemResponse = remote.fetchTodoItem(todoItemId)
+        val lastRevision = todoItemResponse.revision
+        revisionPreferences.setRevision(lastRevision)
+        return mapper.mapDTOToEntity(todoItemResponse.todoItem)
     }
 
-    override fun getTodoItem(todoItemId: String): TodoItem? {
-        return todoList.find {
-            it.id == todoItemId
-        }
+    override suspend fun addTodoItem(todoItem: TodoItem) {
+        remote.createTodoItem(mapper.mapEntityToDTO(todoItem))
     }
 
-    override fun addTodoItem(todoItem: TodoItem) {
-        val item = if (todoItem.id == TodoItem.UNDEFINED_ID) {
-            todoItem.copy(id = autoIncrementId++.toString())
-        } else todoItem
-        todoList.add(item)
-        updateList()
+    override suspend fun editTodoItem(todoItem: TodoItem) {
+        val todoItemDTO = mapper.mapEntityToDTO(todoItem)
+        remote.editTodoItem(todoItemDTO.id, todoItemDTO)
     }
 
-    override fun editTodoItem(todoItem: TodoItem) {
-        val oldElement = getTodoItem(todoItem.id)
-        todoList.remove(oldElement)
-        addTodoItem(todoItem)
-    }
-
-    override fun deleteTodoItem(todoItem: TodoItem) {
-        todoList.remove(todoItem)
-        updateList()
-    }
-
-    private fun updateList() {
-        todoListLD.value = todoList.toList()
+    override suspend fun deleteTodoItem(todoItemId: String) {
+        remote.deleteTodoItem(todoItemId)
     }
 }

@@ -20,4 +20,8 @@
     <string name="save_text">Сохранить</string>
     <string name="importance">Важность</string>
     <string name="delete">Удалить</string>
+
+    <string name="cant_load_data">Не удалось загрузить данные</string>
+    <string name="cant_save_data">Не удалось сохранить изменения</string>
+    <string name="retry">Повторить</string>
 </resources>

@@ -1,26 +1,46 @@
 package school.yandex.todolist.presentation.todolist
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import school.yandex.todolist.data.repository.TodoItemsRepositoryImpl
 import school.yandex.todolist.domain.entity.TodoItem
-import school.yandex.todolist.domain.usecase.*
+import school.yandex.todolist.domain.usecase.DeleteTodoItemUseCase
+import school.yandex.todolist.domain.usecase.EditTodoItemUseCase
+import school.yandex.todolist.domain.usecase.GetTodoListUseCase
 
-class TodoListViewModel : ViewModel() {
+class TodoListViewModel(
+    private val getTodoListUseCase: GetTodoListUseCase,
+    private val editTodoItemUseCase: EditTodoItemUseCase,
+    private val deleteTodoItemUseCase: DeleteTodoItemUseCase,
+) : ViewModel() {
 
-    // add di to pass usecases as parameters
-    private val repository = TodoItemsRepositoryImpl()
-    private val getTodoListUseCase = GetTodoListUseCase(repository)
-    private val getTodoItemUseCase = GetTodoItemUseCase(repository)
-    private val addTodoItemUseCase = AddTodoItemUseCase(repository)
-    private val editTodoItemUseCase = EditTodoItemUseCase(repository)
-    private val deleteTodoItemUseCase = DeleteTodoItemUseCase(repository)
+    private val _isLoading = MutableLiveData(false)
+    val isLoading: LiveData<Boolean> = _isLoading
 
-    val todoList = getTodoListUseCase()
+    private val _isError = MutableLiveData(false)
+    val isError: LiveData<Boolean> = _isError
+
+    private val _todoList = MutableLiveData<List<TodoItem>>(listOf())
+    val todoList: LiveData<List<TodoItem>> = _todoList
+
+    fun fetchTodoList() {
+//        viewModelScope.launch {
+//            withContext(Dispatchers.IO) {
+//                _todoList.value = getTodoListUseCase()
+//            }
+//        }
+        viewModelScope.runCatching {
+            viewModelScope.launch {
+                _todoList.value = getTodoListUseCase()
+            }
+        }
+    }
 
     fun deleteTodoItem(todoItem: TodoItem) {
         viewModelScope.launch {
-            deleteTodoItemUseCase(todoItem)
+            deleteTodoItemUseCase(todoItem.id)
         }
     }
 

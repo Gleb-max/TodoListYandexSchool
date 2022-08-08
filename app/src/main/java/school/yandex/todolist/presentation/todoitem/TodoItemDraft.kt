@@ -12,7 +12,7 @@ data class TodoItemDraft(
     var deadline: Date? = null,
     var isDone: Boolean = false,
     var createdAt: Date? = null,
-    var lastUpdatedBy: Date? = null,
+    var changedAt: Date? = null,
 ) {
 
     fun getReadableDeadline(): String? {
@@ -27,7 +27,7 @@ data class TodoItemDraft(
         deadline = this.deadline,
         isDone = this.isDone,
         createdAt = this.createdAt ?: Date(),
-        lastUpdatedBy = this.lastUpdatedBy,
+        changedAt = this.changedAt,
     )
 
     companion object {
@@ -39,7 +39,9 @@ data class TodoItemDraft(
             deadline = todoItem.deadline,
             isDone = todoItem.isDone,
             createdAt = todoItem.createdAt,
-            lastUpdatedBy = todoItem.lastUpdatedBy,
+            changedAt = todoItem.changedAt,
         )
+
+        fun empty() = TodoItemDraft()
     }
 }

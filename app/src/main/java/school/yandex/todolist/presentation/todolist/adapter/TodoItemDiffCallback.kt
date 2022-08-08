@@ -1,4 +1,4 @@
-package school.yandex.todolist.presentation
+package school.yandex.todolist.presentation.todolist.adapter
 
 import androidx.recyclerview.widget.DiffUtil
 import school.yandex.todolist.domain.entity.TodoItem
