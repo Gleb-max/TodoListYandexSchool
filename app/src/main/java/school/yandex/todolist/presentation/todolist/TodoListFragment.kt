@@ -1,27 +1,22 @@
 package school.yandex.todolist.presentation.todolist
 
 import android.content.Context
-import android.content.res.ColorStateList
+import android.net.ConnectivityManager
+import android.net.Network
 import android.os.Bundle
-import android.util.Log
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
-import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.snackbar.Snackbar
+import org.koin.android.ext.android.inject
 import school.yandex.todolist.R
 import school.yandex.todolist.databinding.FragmentTodoListBinding
 import school.yandex.todolist.domain.entity.TodoItem
-import school.yandex.todolist.presentation.TodoListAdapter
+import school.yandex.todolist.presentation.i.OnSnackBarShowListener
+import school.yandex.todolist.presentation.todolist.adapter.TodoListAdapter
 import kotlin.math.abs
 
 class TodoListFragment : Fragment() {
@@ -30,19 +25,31 @@ class TodoListFragment : Fragment() {
     private val binding: FragmentTodoListBinding
         get() = _binding ?: throw RuntimeException("FragmentTodoListBinding == null")
 
-    private val viewModel: TodoListViewModel by lazy {
-        ViewModelProvider(this)[TodoListViewModel::class.java]
-    }
+    private val viewModel: TodoListViewModel by inject()
 
     private lateinit var todoListAdapter: TodoListAdapter
 
     private lateinit var onTodoListActionsListener: OnTodoListActionsListener
+    private var onSnackBarShowListener: OnSnackBarShowListener? = null
+
+    val connectivityManager: ConnectivityManager by lazy {
+        requireActivity().getSystemService(
+            Context.CONNECTIVITY_SERVICE
+        ) as ConnectivityManager
+    }
+    val networkCallback = object : ConnectivityManager.NetworkCallback() {
+        override fun onAvailable(network: Network) {
+            viewModel.fetchTodoList()
+        }
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
         if (context is OnTodoListActionsListener) onTodoListActionsListener = context
         else throw RuntimeException("Activity must implement OnTodoListActionsListener")
+
+        if (context is OnSnackBarShowListener) onSnackBarShowListener = context
     }
 
     override fun onCreateView(
@@ -61,8 +68,21 @@ class TodoListFragment : Fragment() {
             onTodoListActionsListener.onAddTodoItem()
         }
 
+        binding.swipeToRefresh.setOnRefreshListener {
+            updateTodoList()
+        }
+
         setupAppBar()
         setupRecyclerView()
+
+        updateTodoList()
+
+        connectivityManager.registerDefaultNetworkCallback(networkCallback)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        connectivityManager.unregisterNetworkCallback(networkCallback)
     }
 
     override fun onDestroyView() {
@@ -71,6 +91,9 @@ class TodoListFragment : Fragment() {
     }
 
     private fun observeViewModel() {
+        viewModel.isLoading.observe(viewLifecycleOwner) {
+            binding.swipeToRefresh.isRefreshing = it
+        }
         viewModel.todoList.observe(viewLifecycleOwner) {
             todoListAdapter.submitList(it)
 
@@ -80,21 +103,14 @@ class TodoListFragment : Fragment() {
     }
 
     private fun setupAppBar() {
-        // todo переделать покрасивше + использовать margin в dp из ресурсов
+        // todo переделать покрасивше, используя анимацию для скрытия подтекста
         binding.appBar.addOnOffsetChangedListener(
             AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
-                val layoutParams = FrameLayout.LayoutParams(
-                    binding.ibTodoVisibility.layoutParams
-                )
-                layoutParams.gravity = Gravity.CENTER_VERTICAL or Gravity.END
                 if (abs(verticalOffset) <= appBarLayout.totalScrollRange / 2) {
                     binding.tvDoneCount.visibility = View.VISIBLE
-                    layoutParams.bottomMargin = 0
                 } else {
                     binding.tvDoneCount.visibility = View.GONE
-                    layoutParams.bottomMargin = 16
                 }
-                binding.ibTodoVisibility.layoutParams = layoutParams
             }
         )
     }
@@ -138,6 +154,21 @@ class TodoListFragment : Fragment() {
         }
         val itemTouchHelper = ItemTouchHelper(swipeCallback)
         itemTouchHelper.attachToRecyclerView(rvShopList)
+    }
+
+    private fun updateTodoList() {
+        //todo допилить эту логику, она немного не так работает
+        try {
+            viewModel.fetchTodoList()
+        } catch (exc: Exception) {
+            exc.printStackTrace()
+            onSnackBarShowListener?.showSnackBarMessage(
+                getString(R.string.cant_load_data),
+                getString(R.string.retry),
+                this::updateTodoList
+            )
+        }
+        binding.swipeToRefresh.isRefreshing = false
     }
 
     interface OnTodoListActionsListener {

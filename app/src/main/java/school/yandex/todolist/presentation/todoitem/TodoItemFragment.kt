@@ -1,22 +1,25 @@
 package school.yandex.todolist.presentation.todoitem
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.ColorStateList
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
+import org.koin.android.ext.android.inject
 import school.yandex.todolist.R
+import school.yandex.todolist.core.ext.getReadableDate
 import school.yandex.todolist.databinding.FragmentTodoItemBinding
 import school.yandex.todolist.domain.entity.TodoItem
-import school.yandex.todolist.domain.entity.TodoItemImportance
-import java.text.SimpleDateFormat
+import school.yandex.todolist.presentation.i.OnSnackBarShowListener
 import java.util.*
 
 class TodoItemFragment : Fragment() {
@@ -25,9 +28,7 @@ class TodoItemFragment : Fragment() {
     private val binding: FragmentTodoItemBinding
         get() = _binding ?: throw RuntimeException("FragmentTodoItemBinding == null")
 
-    private val viewModel: TodoItemViewModel by lazy {
-        ViewModelProvider(this)[TodoItemViewModel::class.java]
-    }
+    private val viewModel: TodoItemViewModel by inject()
 
     private val args by navArgs<TodoItemFragmentArgs>()
 
@@ -35,6 +36,7 @@ class TodoItemFragment : Fragment() {
     private var todoItemId: String = TodoItem.UNDEFINED_ID
 
     private lateinit var onTodoItemEditingFinishedListener: OnTodoItemEditingFinishedListener
+    private var onSnackBarShowListener: OnSnackBarShowListener? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -44,6 +46,8 @@ class TodoItemFragment : Fragment() {
         } else {
             throw RuntimeException("Activity must implement OnTodoItemEditingFinishedListener")
         }
+
+        if (context is OnSnackBarShowListener) onSnackBarShowListener = context
     }
 
     override fun onCreateView(
@@ -62,6 +66,21 @@ class TodoItemFragment : Fragment() {
         binding.ibClose.setOnClickListener {
             onTodoItemEditingFinishedListener.onTodoItemEditingFinished()
         }
+
+        binding.btnDelete.setOnClickListener {
+            viewModel.deleteTodoItem(todoItemId)
+            onTodoItemEditingFinishedListener.onTodoItemEditingFinished()
+        }
+        setupImportanceSelector()
+        setupDatePicker()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    private fun setupImportanceSelector() {
         binding.dropdownImportance.setAdapter(
             ArrayAdapter(
                 requireContext(),
@@ -71,11 +90,9 @@ class TodoItemFragment : Fragment() {
                 )
             )
         )
-        binding.btnDelete.isEnabled = screenMode == MODE_EDIT
-        binding.btnDelete.setOnClickListener {
-            viewModel.deleteTodoItem()
-            onTodoItemEditingFinishedListener.onTodoItemEditingFinished()
-        }
+    }
+
+    private fun setupDatePicker() {
         binding.tlDate.setOnClickListener {
             val constraintsBuilder =
                 CalendarConstraints.Builder()
@@ -90,28 +107,20 @@ class TodoItemFragment : Fragment() {
                 val timeZoneUTC = TimeZone.getDefault()
                 val offsetFromUTC = timeZoneUTC.getOffset(Date().time) * -1
 
-                val simpleFormat = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault())
                 val date = Date(it + offsetFromUTC)
-
-                binding.tlDate.setText(simpleFormat.format(date))
-
-                //todo save date to view model
+                viewModel.updateDraft(deadline = date)
             }
 
             picker.show(parentFragmentManager, null)
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
     private fun observeViewModel() {
         viewModel.todoItemDraft.observe(viewLifecycleOwner) {
             if (it != null) {
                 binding.etContent.setText(it.content)
-                //todo
+                binding.tlDate.setText(it.deadline?.getReadableDate())
+//                binding.dropdownImportance.setText("")
             }
         }
     }
@@ -127,27 +136,64 @@ class TodoItemFragment : Fragment() {
     }
 
     private fun launchEditMode() {
-        viewModel.getTodoItem(todoItemId)
+        fetchTodoItem()
 
         binding.btnSave.setOnClickListener {
-            viewModel.editTodoItem(
-                binding.etContent.text.toString(),
-                TodoItemImportance.IMPORTANT,
-                Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, 2) }.time,
-            )
-            onTodoItemEditingFinishedListener.onTodoItemEditingFinished()
+            saveTodoItem()
         }
     }
 
+    @SuppressLint("UseCompatTextViewDrawableApis")
     private fun launchAddMode() {
-        binding.btnSave.setOnClickListener {
-            viewModel.addTodoItem(
-                binding.etContent.text.toString(),
-                TodoItemImportance.IMPORTANT,
-                Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, 10) }.time,
+        with(binding.btnDelete) {
+            isEnabled = false
+            setTextColor(ColorStateList.valueOf(requireContext().getColor(R.color.gray)))
+            setIconTintResource(R.color.gray)
+            compoundDrawableTintList = ColorStateList.valueOf(
+                requireContext().getColor(R.color.gray)
             )
-            onTodoItemEditingFinishedListener.onTodoItemEditingFinished()
         }
+        binding.btnSave.setOnClickListener {
+            saveTodoItem()
+        }
+    }
+
+    private fun fetchTodoItem() {
+        //todo придумать как сделать все эти методы красивыми и переиспользуемыма,
+        // а не каждый в отдельности через try/catch
+        try {
+            viewModel.getTodoItem(todoItemId)
+        } catch (exc: Exception) {
+            exc.printStackTrace()
+            onSnackBarShowListener?.showSnackBarMessage(
+                getString(R.string.cant_load_data),
+                getString(R.string.retry),
+                this::fetchTodoItem
+            )
+        }
+    }
+
+    private fun saveTodoItem() {
+        //todo: переделать это решение
+        // сейчас вижу 2 минуса: дополнительная проверка на screenMode,
+        // хотя уже проверяю в начале и вызываваю launchRightMode;
+        // try/catch тут выглядит не к месту - нужно придумать куда его перенести
+        val success = try {
+            when (screenMode) {
+                MODE_EDIT -> viewModel.editTodoItem()
+                MODE_ADD -> viewModel.addTodoItem()
+            }
+            true
+        } catch (exc: Exception) {
+            exc.printStackTrace()
+            onSnackBarShowListener?.showSnackBarMessage(
+                getString(R.string.cant_save_data),
+                getString(R.string.retry),
+                this::saveTodoItem
+            )
+            false
+        }
+        if (success) onTodoItemEditingFinishedListener.onTodoItemEditingFinished()
     }
 
     interface OnTodoItemEditingFinishedListener {
