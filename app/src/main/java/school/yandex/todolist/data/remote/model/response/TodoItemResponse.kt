@@ -1,7 +1,7 @@
-package school.yandex.todolist.data.repository.remote.model.response
+package school.yandex.todolist.data.remote.model.response
 
 import com.google.gson.annotations.SerializedName
-import school.yandex.todolist.data.repository.remote.model.TodoItemDTO
+import school.yandex.todolist.data.remote.model.TodoItemDTO
 
 data class TodoItemResponse(
     @SerializedName("status") val status: String,

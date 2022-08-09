@@ -3,7 +3,32 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_todo_list">
+    app:startDestination="@+id/navigation_start">
+
+    <action
+        android:id="@+id/action_navigation_todo_list"
+        app:destination="@id/navigation_todo_list"
+        app:launchSingleTop="true"
+        app:popUpTo="@id/mobile_navigation" />
+
+    <fragment
+        android:id="@+id/navigation_start"
+        android:name="school.yandex.todolist.presentation.splash.SplashFragment"
+        android:label="@string/title_splash"
+        tools:layout="@layout/fragment_splash">
+
+        <action
+            android:id="@+id/action_navigation_start_to_navigation_auth"
+            app:destination="@id/navigation_auth"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/mobile_navigation" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_auth"
+        android:name="school.yandex.todolist.presentation.auth.AuthFragment"
+        android:label="@string/title_auth"
+        tools:layout="@layout/fragment_auth" />
 
     <fragment
         android:id="@+id/navigation_todo_list"

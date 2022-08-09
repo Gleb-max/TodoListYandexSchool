@@ -14,9 +14,13 @@ import com.yandex.authsdk.YandexAuthOptions
 import com.yandex.authsdk.YandexAuthSdk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 import school.yandex.todolist.R
+import school.yandex.todolist.core.ext.toast
 import school.yandex.todolist.databinding.ActivityMainBinding
 import school.yandex.todolist.domain.entity.TodoItem
+import school.yandex.todolist.domain.entity.User
+import school.yandex.todolist.presentation.auth.AuthFragment
 import school.yandex.todolist.presentation.i.OnSnackBarShowListener
 import school.yandex.todolist.presentation.todoitem.TodoItemFragment
 import school.yandex.todolist.presentation.todolist.TodoListFragment
@@ -25,9 +29,13 @@ import school.yandex.todolist.presentation.todolist.TodoListFragmentDirections
 class MainActivity : AppCompatActivity(),
     TodoListFragment.OnTodoListActionsListener,
     TodoItemFragment.OnTodoItemEditingFinishedListener,
+    AuthFragment.OnAuthActionsListener,
     OnSnackBarShowListener {
 
     private val binding: ActivityMainBinding by lazy { ActivityMainBinding.inflate(layoutInflater) }
+
+    private val viewModel: MainViewModel by inject()
+
     private val navHostFragment by lazy {
         supportFragmentManager.findFragmentById(R.id.nav_host_fragment_activity_main) as NavHostFragment
     }
@@ -39,44 +47,68 @@ class MainActivity : AppCompatActivity(),
             YandexAuthOptions.Builder(this).build()
         )
     }
-    private val yandexResultLauncher: ActivityResultLauncher<Intent> by lazy {
-        this.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+    private val yandexResultLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             result.data?.let {
-                getYandexAuthData(
-                    result.resultCode,
-                    it
-                )
+                lifecycleScope.launch(Dispatchers.IO) {
+                    runCatching {
+                        val user = getYandexUser(result.resultCode, it)
+                        if (user == null) {
+                            toast(getString(R.string.error_yandex_auth))
+                        } else {
+                            viewModel.saveUser(user)
+                            //todo выпилю это, когда перенесу сохранение юзера в рум
+                            // (там будет автоматически обновляться user во viewmodel)
+                            lifecycleScope.launch(Dispatchers.Main) {
+                                openMainScreen()
+                            }
+                        }
+                    }.onFailure {
+                        it.printStackTrace()
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            toast(getString(R.string.error_yandex_auth))
+                        }
+                    }
+                }
+            }
+        }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(binding.root)
+
+        observeViewModel()
+    }
+
+    private fun observeViewModel() {
+        viewModel.user.observe(this) {
+            if (it != null) {
+                if (it.uid == null) openAuthScreen()
+                else openMainScreen()
             }
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    private fun getYandexUser(resultCode: Int, data: Intent): User? {
+        val yandexAuthToken = yandexAuthSdk.extractToken(resultCode, data) ?: return null
+        val jwt = JWT(yandexAuthSdk.getJwt(yandexAuthToken))
+        val userId = jwt.getClaim("uid").asString()
+        val userName = jwt.getClaim("name").asString()
+        return User(userId, userName.toString())
+    }
 
+    private fun openAuthScreen() {
+        navController.navigate(R.id.action_navigation_start_to_navigation_auth)
+    }
+
+    private fun openMainScreen() {
+        navController.navigate(R.id.action_navigation_todo_list)
+    }
+
+    override fun onLogin() {
         val loginOptionsBuilder = YandexAuthLoginOptions.Builder()
         val yandexAuthIntent = yandexAuthSdk.createLoginIntent(loginOptionsBuilder.build())
         yandexResultLauncher.launch(yandexAuthIntent)
-    }
-
-    private fun getYandexAuthData(resultCode: Int, data: Intent) {
-        val yandexAuthToken = yandexAuthSdk.extractToken(resultCode, data)
-        if (yandexAuthToken == null) {
-            //todo: обработать этот случай
-            return
-        }
-        lifecycleScope.launch(Dispatchers.IO) {
-            val jwt = JWT(yandexAuthSdk.getJwt(yandexAuthToken))
-            val userId = jwt.getClaim("uid").asString()
-            val userName = jwt.getClaim("name").asString()
-            setupMainScreen()
-            //todo добавить репо + юзкейс и сохранять данные юзера
-        }
-    }
-
-    private fun setupMainScreen() {
-        lifecycleScope.launch(Dispatchers.Main) {
-            setContentView(binding.root)
-        }
     }
 
     override fun onAddTodoItem() {

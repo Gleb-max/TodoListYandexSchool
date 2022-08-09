@@ -80,13 +80,9 @@ class TodoListFragment : Fragment() {
         connectivityManager.registerDefaultNetworkCallback(networkCallback)
     }
 
-    override fun onPause() {
-        super.onPause()
-        connectivityManager.unregisterNetworkCallback(networkCallback)
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
+        connectivityManager.unregisterNetworkCallback(networkCallback)
         _binding = null
     }
 
@@ -157,7 +153,6 @@ class TodoListFragment : Fragment() {
     }
 
     private fun updateTodoList() {
-        //todo допилить эту логику, она немного не так работает
         try {
             viewModel.fetchTodoList()
         } catch (exc: Exception) {

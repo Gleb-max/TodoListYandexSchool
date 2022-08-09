@@ -1,4 +1,4 @@
-package school.yandex.todolist.data.repository.remote.model
+package school.yandex.todolist.data.remote.model
 
 import com.google.gson.annotations.SerializedName
 import school.yandex.todolist.domain.entity.TodoItemImportance

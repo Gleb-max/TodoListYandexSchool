@@ -1,6 +1,6 @@
-package school.yandex.todolist.data.repository.mapper
+package school.yandex.todolist.data.mapper
 
-import school.yandex.todolist.data.repository.remote.model.TodoItemDTO
+import school.yandex.todolist.data.remote.model.TodoItemDTO
 import school.yandex.todolist.domain.entity.TodoItem
 import java.util.*
 

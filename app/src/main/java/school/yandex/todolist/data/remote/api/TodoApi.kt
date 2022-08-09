@@ -1,9 +1,9 @@
-package school.yandex.todolist.data.repository.remote.api
+package school.yandex.todolist.data.remote.api
 
 import retrofit2.http.*
-import school.yandex.todolist.data.repository.remote.model.TodoItemDTO
-import school.yandex.todolist.data.repository.remote.model.response.TodoItemResponse
-import school.yandex.todolist.data.repository.remote.model.response.TodoListResponse
+import school.yandex.todolist.data.remote.model.TodoItemDTO
+import school.yandex.todolist.data.remote.model.response.TodoItemResponse
+import school.yandex.todolist.data.remote.model.response.TodoListResponse
 
 interface TodoApi {
 

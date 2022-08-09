@@ -1,7 +1,9 @@
-package school.yandex.todolist.data.repository.local
+package school.yandex.todolist.data.local
 
 import android.content.Context
 
+
+//todo save in room
 class RevisionPreferences(context: Context) {
     // todo: можно подумать, что тут может случиться утечка контекста,
     //  но из di тут всегда будет application, поэтому придумать как сделать чище это место

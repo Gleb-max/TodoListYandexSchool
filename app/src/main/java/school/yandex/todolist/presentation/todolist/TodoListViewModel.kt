@@ -26,15 +26,8 @@ class TodoListViewModel(
     val todoList: LiveData<List<TodoItem>> = _todoList
 
     fun fetchTodoList() {
-//        viewModelScope.launch {
-//            withContext(Dispatchers.IO) {
-//                _todoList.value = getTodoListUseCase()
-//            }
-//        }
-        viewModelScope.runCatching {
-            viewModelScope.launch {
-                _todoList.value = getTodoListUseCase()
-            }
+        viewModelScope.launch {
+            _todoList.value = getTodoListUseCase()
         }
     }
 
