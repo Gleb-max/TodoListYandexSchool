@@ -12,6 +12,7 @@ import school.yandex.todolist.data.local.UserPreferences
 import school.yandex.todolist.data.remote.api.TodoApi
 import school.yandex.todolist.data.remote.interceptor.AuthHeaderInterceptor
 import school.yandex.todolist.data.remote.interceptor.LastRevisionInterceptor
+import school.yandex.todolist.data.remote.interceptor.RetryInterceptor
 import school.yandex.todolist.data.repository.TodoItemsRepositoryImpl
 import school.yandex.todolist.data.repository.UsersRepositoryImpl
 import school.yandex.todolist.domain.repository.TodoItemsRepository
@@ -56,6 +57,7 @@ private val networkModule = module {
             with(interceptors()) {
                 addInterceptor(AuthHeaderInterceptor())
                 addInterceptor(LastRevisionInterceptor(get()))
+                addInterceptor(RetryInterceptor())
                 addInterceptor(HttpLoggingInterceptor().apply {
                     level = HttpLoggingInterceptor.Level.BASIC
                 })
