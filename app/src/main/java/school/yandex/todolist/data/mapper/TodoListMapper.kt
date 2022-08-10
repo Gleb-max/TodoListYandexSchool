@@ -2,6 +2,7 @@ package school.yandex.todolist.data.mapper
 
 import school.yandex.todolist.data.remote.model.TodoItemDTO
 import school.yandex.todolist.domain.entity.TodoItem
+import school.yandex.todolist.domain.entity.TodoItemImportance
 import java.util.*
 
 class TodoListMapper {
@@ -10,7 +11,7 @@ class TodoListMapper {
     fun mapEntityToDTO(todoItem: TodoItem) = TodoItemDTO(
         id = todoItem.id,
         text = todoItem.content,
-        importance = todoItem.importance,
+        importance = todoItem.importance.name.lowercase(),
         deadline = todoItem.deadline?.time,
         isDone = todoItem.isDone,
         color = null,
@@ -22,7 +23,7 @@ class TodoListMapper {
     fun mapDTOToEntity(todoItemDTO: TodoItemDTO) = TodoItem(
         id = todoItemDTO.id,
         content = todoItemDTO.text,
-        importance = todoItemDTO.importance,
+        importance = TodoItemImportance.valueOf(todoItemDTO.importance),
         deadline = todoItemDTO.deadline?.let { Date(it) },
         isDone = todoItemDTO.isDone,
         createdAt = Date(todoItemDTO.createdAt),

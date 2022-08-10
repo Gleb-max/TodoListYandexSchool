@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import school.yandex.todolist.core.viewmodel.BaseViewModel
 import school.yandex.todolist.domain.entity.User
 import school.yandex.todolist.domain.usecase.GetUserUseCase
 import school.yandex.todolist.domain.usecase.SaveUserUseCase
@@ -12,7 +13,7 @@ import school.yandex.todolist.domain.usecase.SaveUserUseCase
 class MainViewModel(
     private val getUserUseCase: GetUserUseCase,
     private val saveUserUseCase: SaveUserUseCase
-) : ViewModel() {
+) : BaseViewModel() {
 
     private val _user = MutableLiveData<User?>(null)
     val user: LiveData<User?> = _user

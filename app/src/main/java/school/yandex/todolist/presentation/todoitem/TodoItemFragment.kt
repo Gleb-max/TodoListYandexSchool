@@ -4,11 +4,9 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
@@ -122,6 +120,7 @@ class TodoItemFragment : Fragment() {
             if (it != null) {
                 binding.etContent.setText(it.content)
                 binding.tlDate.setText(it.deadline?.getReadableDate())
+                //todo
 //                binding.dropdownImportance.setText("")
             }
         }
@@ -161,41 +160,32 @@ class TodoItemFragment : Fragment() {
     }
 
     private fun fetchTodoItem() {
-        //todo придумать как сделать все эти методы красивыми и переиспользуемыма,
-        // а не каждый в отдельности через try/catch
-        try {
-            viewModel.getTodoItem(todoItemId)
-        } catch (exc: Exception) {
-            exc.printStackTrace()
+        viewModel.getTodoItem(todoItemId, onError = {
             onSnackBarShowListener?.showSnackBarMessage(
                 getString(R.string.cant_load_data),
                 getString(R.string.retry),
                 this::fetchTodoItem
             )
-        }
+        })
     }
 
     private fun saveTodoItem() {
         //todo: переделать это решение
-        // сейчас вижу 2 минуса: дополнительная проверка на screenMode,
+        // сейчас вижу минус: дополнительная проверка на screenMode,
         // хотя уже проверяю в начале и вызываваю launchRightMode;
-        // try/catch тут выглядит не к месту - нужно придумать куда его перенести
-        val success = try {
-            when (screenMode) {
-                MODE_EDIT -> viewModel.editTodoItem()
-                MODE_ADD -> viewModel.addTodoItem()
-            }
-            true
-        } catch (exc: Exception) {
-            exc.printStackTrace()
+
+        val onError: () -> Unit = {
             onSnackBarShowListener?.showSnackBarMessage(
                 getString(R.string.cant_save_data),
                 getString(R.string.retry),
                 this::saveTodoItem
             )
-            false
         }
-        if (success) onTodoItemEditingFinishedListener.onTodoItemEditingFinished()
+        val onSuccess = { onTodoItemEditingFinishedListener.onTodoItemEditingFinished() }
+        when (screenMode) {
+            MODE_EDIT -> viewModel.editTodoItem(onError = onError, onSuccess = onSuccess)
+            MODE_ADD -> viewModel.addTodoItem(onError = onError, onSuccess = onSuccess)
+        }
     }
 
     interface OnTodoItemEditingFinishedListener {

@@ -32,12 +32,12 @@ class TodoListFragment : Fragment() {
     private lateinit var onTodoListActionsListener: OnTodoListActionsListener
     private var onSnackBarShowListener: OnSnackBarShowListener? = null
 
-    val connectivityManager: ConnectivityManager by lazy {
+    private val connectivityManager: ConnectivityManager by lazy {
         requireActivity().getSystemService(
             Context.CONNECTIVITY_SERVICE
         ) as ConnectivityManager
     }
-    val networkCallback = object : ConnectivityManager.NetworkCallback() {
+    private val networkCallback = object : ConnectivityManager.NetworkCallback() {
         override fun onAvailable(network: Network) {
             viewModel.fetchTodoList()
         }
@@ -144,8 +144,8 @@ class TodoListFragment : Fragment() {
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val item = todoListAdapter.currentList[viewHolder.adapterPosition]
-                if (direction == ItemTouchHelper.LEFT) viewModel.deleteTodoItem(item)
-                else if (direction == ItemTouchHelper.RIGHT) viewModel.changeStatusTodoItem(item)
+                if (direction == ItemTouchHelper.LEFT) deleteTodoItem(item)
+                else if (direction == ItemTouchHelper.RIGHT) changeStatusTodoItem(item)
             }
         }
         val itemTouchHelper = ItemTouchHelper(swipeCallback)
@@ -153,17 +153,36 @@ class TodoListFragment : Fragment() {
     }
 
     private fun updateTodoList() {
-        try {
-            viewModel.fetchTodoList()
-        } catch (exc: Exception) {
-            exc.printStackTrace()
+        viewModel.fetchTodoList(
+            onSuccess = {
+                binding.swipeToRefresh.isRefreshing = false
+            },
+            onError = {
+                onSnackBarShowListener?.showSnackBarMessage(
+                    getString(R.string.cant_load_data),
+                    getString(R.string.retry),
+                    this::updateTodoList
+                )
+                binding.swipeToRefresh.isRefreshing = false
+            })
+    }
+
+    private fun deleteTodoItem(item: TodoItem) {
+        viewModel.deleteTodoItem(item, onError = {
             onSnackBarShowListener?.showSnackBarMessage(
-                getString(R.string.cant_load_data),
-                getString(R.string.retry),
-                this::updateTodoList
-            )
-        }
-        binding.swipeToRefresh.isRefreshing = false
+                getString(R.string.cant_save_data),
+                getString(R.string.retry)
+            ) { deleteTodoItem(item) }
+        })
+    }
+
+    private fun changeStatusTodoItem(item: TodoItem) {
+        viewModel.changeStatusTodoItem(item, onError = {
+            onSnackBarShowListener?.showSnackBarMessage(
+                getString(R.string.cant_save_data),
+                getString(R.string.retry)
+            ) { changeStatusTodoItem(item) }
+        })
     }
 
     interface OnTodoListActionsListener {

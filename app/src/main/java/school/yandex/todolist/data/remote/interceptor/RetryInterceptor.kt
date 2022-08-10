@@ -10,6 +10,9 @@ class RetryInterceptor : Interceptor {
         var response = chain.proceed(request)
         var retryCount = 0
 
+        //todo: добавить проверку на статус и возможно не стоит ретраить 400 ошибки
+        // это не сложно поэтому сфокусировался на другом
+
         while (!response.isSuccessful && retryCount < RETRY_COUNT) {
             response.close()
             response = chain.proceed(request)

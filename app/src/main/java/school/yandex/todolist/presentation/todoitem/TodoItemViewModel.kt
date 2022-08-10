@@ -1,10 +1,10 @@
 package school.yandex.todolist.presentation.todoitem
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.launch
+import school.yandex.todolist.core.viewmodel.BaseViewModel
 import school.yandex.todolist.domain.entity.TodoItem
 import school.yandex.todolist.domain.entity.TodoItemImportance
 import school.yandex.todolist.domain.usecase.AddTodoItemUseCase
@@ -18,7 +18,7 @@ class TodoItemViewModel(
     private val editTodoItemUseCase: EditTodoItemUseCase,
     private val addTodoItemUseCase: AddTodoItemUseCase,
     private val deleteTodoItemUseCase: DeleteTodoItemUseCase,
-) : ViewModel() {
+) : BaseViewModel() {
 
     private val _todoItemDraft = MutableLiveData(TodoItemDraft.empty())
     val todoItemDraft: LiveData<TodoItemDraft>
@@ -37,23 +37,34 @@ class TodoItemViewModel(
             todoItemDraft.value?.copy(importance = importance)
     }
 
-    fun getTodoItem(todoItemId: String) {
-        viewModelScope.launch {
+    fun getTodoItem(
+        todoItemId: String,
+        onError: (() -> Unit)? = null,
+        onSuccess: (() -> Unit)? = null
+    ) {
+        viewModelScope.execute(onSuccess, onError) {
             val item = getTodoItemUseCase(todoItemId)
             _todoItemDraft.value = TodoItemDraft.fromEntity(item)
         }
     }
 
-    fun deleteTodoItem(todoItemId: String) {
-        viewModelScope.launch {
+    fun deleteTodoItem(
+        todoItemId: String,
+        onError: (() -> Unit)? = null,
+        onSuccess: (() -> Unit)? = null
+    ) {
+        viewModelScope.execute(onSuccess, onError) {
             deleteTodoItemUseCase(todoItemId)
         }
     }
 
-    fun addTodoItem() {
-        viewModelScope.launch {
+    fun addTodoItem(
+        onError: (() -> Unit)? = null,
+        onSuccess: (() -> Unit)? = null
+    ) {
+        viewModelScope.execute(onSuccess, onError) {
             //todo: возможно кидать здесь какую-нибудь ошибку если null
-            val draftTodoItem = todoItemDraft.value ?: return@launch
+            val draftTodoItem = todoItemDraft.value ?: return@execute
             addTodoItemUseCase(
                 //todo: переписать здесь также на мапперы как в data слое маппер entityToDTO
                 TodoItem(
@@ -69,10 +80,13 @@ class TodoItemViewModel(
         }
     }
 
-    fun editTodoItem() {
-        viewModelScope.launch {
+    fun editTodoItem(
+        onError: (() -> Unit)? = null,
+        onSuccess: (() -> Unit)? = null
+    ) {
+        viewModelScope.execute(onSuccess, onError) {
             //todo: возможно кидать здесь какую-нибудь ошибку если null
-            val draftTodoItem = todoItemDraft.value ?: return@launch
+            val draftTodoItem = todoItemDraft.value ?: return@execute
             editTodoItemUseCase(
                 //todo: переписать здесь также на мапперы как в data слое маппер entityToDTO
                 TodoItem(
