@@ -1,0 +1,1 @@
+Тут еще допишу, АПК [тут](https://github.com/Gleb-max/TodoListYandexSchool/blob/develop/app/build/intermediates/apk/debug/app-debug.apk)

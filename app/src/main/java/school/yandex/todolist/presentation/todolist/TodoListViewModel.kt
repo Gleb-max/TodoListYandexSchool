@@ -2,9 +2,8 @@ package school.yandex.todolist.presentation.todolist
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.launch
+import school.yandex.todolist.core.viewmodel.BaseViewModel
 import school.yandex.todolist.domain.entity.TodoItem
 import school.yandex.todolist.domain.usecase.DeleteTodoItemUseCase
 import school.yandex.todolist.domain.usecase.EditTodoItemUseCase
@@ -14,7 +13,7 @@ class TodoListViewModel(
     private val getTodoListUseCase: GetTodoListUseCase,
     private val editTodoItemUseCase: EditTodoItemUseCase,
     private val deleteTodoItemUseCase: DeleteTodoItemUseCase,
-) : ViewModel() {
+) : BaseViewModel() {
 
     private val _isLoading = MutableLiveData(false)
     val isLoading: LiveData<Boolean> = _isLoading
@@ -25,27 +24,32 @@ class TodoListViewModel(
     private val _todoList = MutableLiveData<List<TodoItem>>(listOf())
     val todoList: LiveData<List<TodoItem>> = _todoList
 
-    fun fetchTodoList() {
-//        viewModelScope.launch {
-//            withContext(Dispatchers.IO) {
-//                _todoList.value = getTodoListUseCase()
-//            }
-//        }
-        viewModelScope.runCatching {
-            viewModelScope.launch {
-                _todoList.value = getTodoListUseCase()
-            }
+    fun fetchTodoList(
+        onError: (() -> Unit)? = null,
+        onSuccess: (() -> Unit)? = null
+    ) {
+        viewModelScope.execute(onSuccess, onError) {
+            val todoList = getTodoListUseCase()
+            _todoList.value = todoList
         }
     }
 
-    fun deleteTodoItem(todoItem: TodoItem) {
-        viewModelScope.launch {
+    fun deleteTodoItem(
+        todoItem: TodoItem,
+        onError: (() -> Unit)? = null,
+        onSuccess: (() -> Unit)? = null
+    ) {
+        viewModelScope.execute(onSuccess, onError) {
             deleteTodoItemUseCase(todoItem.id)
         }
     }
 
-    fun changeStatusTodoItem(todoItem: TodoItem) {
-        viewModelScope.launch {
+    fun changeStatusTodoItem(
+        todoItem: TodoItem,
+        onError: (() -> Unit)? = null,
+        onSuccess: (() -> Unit)? = null
+    ) {
+        viewModelScope.execute(onSuccess, onError) {
             editTodoItemUseCase(todoItem.copy(isDone = !todoItem.isDone))
         }
     }

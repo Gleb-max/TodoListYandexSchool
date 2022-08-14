@@ -12,4 +12,7 @@ private val useCaseModule = module {
     factory { EditTodoItemUseCase(get()) }
     factory { AddTodoItemUseCase(get()) }
     factory { DeleteTodoItemUseCase(get()) }
+
+    factory { GetUserUseCase(get()) }
+    factory { SaveUserUseCase(get()) }
 }

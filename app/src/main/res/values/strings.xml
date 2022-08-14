@@ -10,6 +10,8 @@
     <string name="add_todo_item_content_description">Add Todo Item</string>
 
     // titles
+    <string name="title_splash">Splash</string>
+    <string name="title_auth">Auth</string>
     <string name="title_todo_list">Todo List</string>
     <string name="title_todo_item_details">Todo Item Details</string>
     <string name="my_tasks">Мои дела</string>
@@ -24,4 +26,8 @@
     <string name="cant_load_data">Не удалось загрузить данные</string>
     <string name="cant_save_data">Не удалось сохранить изменения</string>
     <string name="retry">Повторить</string>
+    <string name="login_label">Войти</string>
+
+    //errors
+    <string name="error_yandex_auth">Не удалось войти</string>
 </resources>

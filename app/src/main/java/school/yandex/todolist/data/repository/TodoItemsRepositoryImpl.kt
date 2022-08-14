@@ -1,8 +1,8 @@
 package school.yandex.todolist.data.repository
 
-import school.yandex.todolist.data.repository.local.RevisionPreferences
-import school.yandex.todolist.data.repository.mapper.TodoListMapper
-import school.yandex.todolist.data.repository.remote.api.TodoApi
+import school.yandex.todolist.data.local.RevisionPreferences
+import school.yandex.todolist.data.mapper.TodoListMapper
+import school.yandex.todolist.data.remote.api.TodoApi
 import school.yandex.todolist.domain.entity.TodoItem
 import school.yandex.todolist.domain.repository.TodoItemsRepository
 
