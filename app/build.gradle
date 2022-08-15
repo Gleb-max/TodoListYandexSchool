@@ -80,12 +80,12 @@ dependencies {
     implementation "androidx.work:work-runtime-ktx:$work_manager_version"
 
     // Dagger todo: перейти на него
-//    implementation 'com.google.dagger:dagger:2.35.1'
-//    kapt 'com.google.dagger:dagger-compiler:2.35.1'
+    implementation 'com.google.dagger:dagger:2.35.1'
+    kapt 'com.google.dagger:dagger-compiler:2.35.1'
 
     // Koin
-    implementation "io.insert-koin:koin-android:$koin_version"
-    implementation "io.insert-koin:koin-androidx-compose:$koin_version"
+//    implementation "io.insert-koin:koin-android:$koin_version"
+//    implementation "io.insert-koin:koin-androidx-compose:$koin_version"
 
     // yandex auth
     implementation "com.yandex.android:authsdk:$yandex_auth_version"

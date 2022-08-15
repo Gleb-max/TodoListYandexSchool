@@ -29,5 +29,6 @@
     <string name="login_label">Войти</string>
 
     //errors
-    <string name="error_yandex_auth">Не удалось войти</string>
+    <string name="error_yandex_auth">Произошла ошибка. Повторите попытку позже.</string>
+    <string name="add_todo_item_text">Новое</string>
 </resources>

@@ -1,11 +1,12 @@
 package school.yandex.todolist.data.mapper
 
-import school.yandex.todolist.data.remote.model.TodoItemDTO
+import school.yandex.todolist.data.source.remote.model.TodoItemDTO
 import school.yandex.todolist.domain.entity.TodoItem
 import school.yandex.todolist.domain.entity.TodoItemImportance
 import java.util.*
+import javax.inject.Inject
 
-class TodoListMapper {
+class TodoListMapper @Inject constructor() {
 
     //todo: добавить инициализацию полей color и lastUpdatedBy
     fun mapEntityToDTO(todoItem: TodoItem) = TodoItemDTO(

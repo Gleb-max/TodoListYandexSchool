@@ -1,18 +1,18 @@
 package school.yandex.todolist.data.repository
 
-import school.yandex.todolist.data.local.RevisionPreferences
 import school.yandex.todolist.data.mapper.TodoListMapper
-import school.yandex.todolist.data.remote.api.TodoApi
+import school.yandex.todolist.data.source.local.RevisionPreferences
+import school.yandex.todolist.data.source.remote.api.TodoApi
 import school.yandex.todolist.domain.entity.TodoItem
 import school.yandex.todolist.domain.repository.TodoItemsRepository
+import javax.inject.Inject
 
 //todo: add local data source to constructor
-class TodoItemsRepositoryImpl(
+class TodoItemsRepositoryImpl @Inject constructor(
     private val remote: TodoApi,
-    private val revisionPreferences: RevisionPreferences
+    private val revisionPreferences: RevisionPreferences,
+    private val mapper: TodoListMapper
 ) : TodoItemsRepository {
-
-    private val mapper = TodoListMapper()
 
     override suspend fun getTodoList(): List<TodoItem> {
         val todoListResponse = remote.fetchTodoList()
