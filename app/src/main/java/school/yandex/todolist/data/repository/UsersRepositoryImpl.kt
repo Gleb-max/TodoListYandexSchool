@@ -1,10 +1,11 @@
 package school.yandex.todolist.data.repository
 
-import school.yandex.todolist.data.local.UserPreferences
+import school.yandex.todolist.data.source.local.UserPreferences
 import school.yandex.todolist.domain.entity.User
 import school.yandex.todolist.domain.repository.UserRepository
+import javax.inject.Inject
 
-class UsersRepositoryImpl(
+class UsersRepositoryImpl @Inject constructor(
     private val local: UserPreferences
 ) : UserRepository {
 

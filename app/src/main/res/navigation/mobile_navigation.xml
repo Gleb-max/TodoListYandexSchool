@@ -13,7 +13,7 @@
 
     <fragment
         android:id="@+id/navigation_start"
-        android:name="school.yandex.todolist.presentation.splash.SplashFragment"
+        android:name="school.yandex.todolist.presentation.view.SplashFragment"
         android:label="@string/title_splash"
         tools:layout="@layout/fragment_splash">
 
@@ -26,13 +26,13 @@
 
     <fragment
         android:id="@+id/navigation_auth"
-        android:name="school.yandex.todolist.presentation.auth.AuthFragment"
+        android:name="school.yandex.todolist.presentation.view.AuthFragment"
         android:label="@string/title_auth"
         tools:layout="@layout/fragment_auth" />
 
     <fragment
         android:id="@+id/navigation_todo_list"
-        android:name="school.yandex.todolist.presentation.todolist.TodoListFragment"
+        android:name="school.yandex.todolist.presentation.view.TodoListFragment"
         android:label="@string/title_todo_list"
         tools:layout="@layout/fragment_todo_list">
         <action
@@ -42,7 +42,7 @@
 
     <fragment
         android:id="@+id/navigation_todo_item_details"
-        android:name="school.yandex.todolist.presentation.todoitem.TodoItemFragment"
+        android:name="school.yandex.todolist.presentation.view.TodoItemFragment"
         android:label="@string/title_todo_item_details"
         tools:layout="@layout/fragment_todo_item">
         <argument
