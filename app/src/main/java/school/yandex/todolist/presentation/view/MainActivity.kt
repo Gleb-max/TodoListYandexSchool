@@ -2,7 +2,6 @@ package school.yandex.todolist.presentation.view
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -20,7 +19,6 @@ import school.yandex.todolist.R
 import school.yandex.todolist.TodoApp
 import school.yandex.todolist.core.ext.toast
 import school.yandex.todolist.databinding.ActivityMainBinding
-import school.yandex.todolist.domain.entity.TodoItem
 import school.yandex.todolist.domain.entity.User
 import school.yandex.todolist.presentation.i.OnSnackBarShowListener
 import school.yandex.todolist.presentation.stateholder.MainViewModel
@@ -28,8 +26,6 @@ import school.yandex.todolist.presentation.stateholder.ViewModelFactory
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity(),
-    TodoListFragment.OnTodoListActionsListener,
-    TodoItemFragment.OnTodoItemEditingFinishedListener,
     AuthFragment.OnAuthActionsListener,
     OnSnackBarShowListener {
 
@@ -95,12 +91,12 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun observeViewModel() {
-        viewModel.user.observe(this) {
-            if (it != null) {
-                if (it.uid == null) openAuthScreen()
-                else openMainScreen()
-            }
-        }
+//        viewModel.user.observe(this) {
+//            if (it != null) {
+//                if (it.uid == null) openAuthScreen()
+//                else openMainScreen()
+//            }
+//        }
     }
 
     private fun getYandexUser(resultCode: Int, data: Intent): User? {
@@ -123,22 +119,6 @@ class MainActivity : AppCompatActivity(),
         val loginOptionsBuilder = YandexAuthLoginOptions.Builder()
         val yandexAuthIntent = yandexAuthSdk.createLoginIntent(loginOptionsBuilder.build())
         yandexResultLauncher.launch(yandexAuthIntent)
-    }
-
-    override fun onAddTodoItem() {
-        navController.navigate(R.id.navigation_todo_item_details)
-    }
-
-    override fun onEditTodoItem(todoItem: TodoItem) {
-        navController.navigate(
-            TodoListFragmentDirections.actionNavigationTodoListToNavigationTodoItemDetails(
-                todoItem.id
-            )
-        )
-    }
-
-    override fun onTodoItemEditingFinished() {
-        navController.navigateUp()
     }
 
     override fun showSnackBarMessage(title: String, action: String?, actionCallBack: () -> Unit) {

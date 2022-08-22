@@ -14,6 +14,7 @@
     <string name="title_auth">Auth</string>
     <string name="title_todo_list">Todo List</string>
     <string name="title_todo_item_details">Todo Item Details</string>
+    <string name="title_settings">Todo List</string>
     <string name="my_tasks">Мои дела</string>
     <string name="items_done_subtitle">Выполнено — %1$d</string>
 

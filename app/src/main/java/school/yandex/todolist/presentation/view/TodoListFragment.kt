@@ -1,5 +1,6 @@
 package school.yandex.todolist.presentation.view
 
+import android.animation.AnimatorInflater
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
@@ -9,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.AppBarLayout
@@ -36,9 +38,14 @@ class TodoListFragment : Fragment() {
         (requireActivity().application as TodoApp).component
     }
 
+    private val scaleAnimation by lazy(mode = LazyThreadSafetyMode.NONE) {
+        AnimatorInflater.loadAnimator(
+            context, R.animator.pulse_animator
+        )
+    }
+
     private lateinit var todoListAdapter: TodoListAdapter
 
-    private lateinit var onTodoListActionsListener: OnTodoListActionsListener
     private var onSnackBarShowListener: OnSnackBarShowListener? = null
 
     private val connectivityManager: ConnectivityManager by lazy {
@@ -55,9 +62,6 @@ class TodoListFragment : Fragment() {
     override fun onAttach(context: Context) {
         component.inject(this)
         super.onAttach(context)
-
-        if (context is OnTodoListActionsListener) onTodoListActionsListener = context
-        else throw RuntimeException("Activity must implement OnTodoListActionsListener")
         if (context is OnSnackBarShowListener) onSnackBarShowListener = context
     }
 
@@ -77,13 +81,16 @@ class TodoListFragment : Fragment() {
 
         with(binding) {
             fab.setOnClickListener {
-                onTodoListActionsListener.onAddTodoItem()
+                onAddTodoItem()
             }
             swipeToRefresh.setOnRefreshListener {
                 updateTodoList()
             }
             btnAddTodoItem.setOnClickListener {
-                onTodoListActionsListener.onAddTodoItem()
+                onAddTodoItem()
+            }
+            ibTodoVisibility.setOnClickListener {
+                viewModel.changeItemsVisibility()
             }
         }
 
@@ -101,14 +108,39 @@ class TodoListFragment : Fragment() {
         _binding = null
     }
 
+    private fun onEditTodoItem(todoItem: TodoItem) {
+        findNavController().navigate(
+            TodoListFragmentDirections.actionNavigationTodoListToNavigationTodoItemDetails(
+                todoItem.id
+            )
+        )
+    }
+
+    private fun onAddTodoItem() {
+        findNavController().navigate(R.id.navigation_todo_item_details)
+    }
+
     private fun observeViewModel() {
         viewModel.isLoading.observe(viewLifecycleOwner) {
             binding.swipeToRefresh.isRefreshing = it
         }
         viewModel.todoList.observe(viewLifecycleOwner) {
             todoListAdapter.submitList(it)
+
+            if (it.isEmpty()) {
+                scaleAnimation.setTarget(binding.fab)
+                scaleAnimation.start()
+            } else {
+                scaleAnimation.end()
+            }
+        }
+        viewModel.allTodoItems.observe(viewLifecycleOwner) {
             val doneCount = it.count { item -> item.isDone }
             binding.tvDoneCount.text = getString(R.string.items_done_subtitle, doneCount)
+        }
+        viewModel.isAllItems.observe(viewLifecycleOwner) {
+            val imageResource = if (it) R.drawable.ic_visibility_off else R.drawable.ic_visibility
+            binding.ibTodoVisibility.setImageResource(imageResource)
         }
     }
 
@@ -136,7 +168,7 @@ class TodoListFragment : Fragment() {
 
     private fun setupClickListener() {
         todoListAdapter.onTodoItemClickListener = {
-            onTodoListActionsListener.onEditTodoItem(it)
+            onEditTodoItem(it)
         }
         todoListAdapter.onTodoItemCheckListener = {
             viewModel.changeStatusTodoItem(it)
@@ -197,12 +229,5 @@ class TodoListFragment : Fragment() {
                 getString(R.string.retry)
             ) { changeStatusTodoItem(item) }
         })
-    }
-
-    interface OnTodoListActionsListener {
-
-        fun onAddTodoItem()
-
-        fun onEditTodoItem(todoItem: TodoItem)
     }
 }

@@ -10,10 +10,14 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.transition.Slide
+import com.google.android.material.color.MaterialColors
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.transition.MaterialSharedAxis
 import school.yandex.todolist.R
 import school.yandex.todolist.TodoApp
 import school.yandex.todolist.core.ext.getReadableDate
@@ -45,20 +49,11 @@ class TodoItemFragment : Fragment() {
     private var screenMode: String = MODE_UNKNOWN
     private var todoItemId: String = TodoItem.UNDEFINED_ID
 
-    private lateinit var onTodoItemEditingFinishedListener: OnTodoItemEditingFinishedListener
     private var onSnackBarShowListener: OnSnackBarShowListener? = null
 
     override fun onAttach(context: Context) {
         component.inject(this)
-
         super.onAttach(context)
-
-        if (context is OnTodoItemEditingFinishedListener) {
-            onTodoItemEditingFinishedListener = context
-        } else {
-            throw RuntimeException("Activity must implement OnTodoItemEditingFinishedListener")
-        }
-
         if (context is OnSnackBarShowListener) onSnackBarShowListener = context
     }
 
@@ -66,25 +61,29 @@ class TodoItemFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+
+        enterTransition = Slide()
+        returnTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
+
         _binding = FragmentTodoItemBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        launchRightMode()
 
         viewModel = ViewModelProvider(this, viewModelFactory)[TodoItemViewModel::class.java]
-
         observeViewModel()
 
+        launchRightMode()
+
         binding.ibClose.setOnClickListener {
-            onTodoItemEditingFinishedListener.onTodoItemEditingFinished()
+            onTodoItemEditingFinished()
         }
 
         binding.btnDelete.setOnClickListener {
             viewModel.deleteTodoItem(todoItemId)
-            onTodoItemEditingFinishedListener.onTodoItemEditingFinished()
+            onTodoItemEditingFinished()
         }
         setupImportanceSelector()
         setupDatePicker()
@@ -93,6 +92,10 @@ class TodoItemFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun onTodoItemEditingFinished() {
+        findNavController().navigateUp()
     }
 
     private fun setupImportanceSelector() {
@@ -163,11 +166,11 @@ class TodoItemFragment : Fragment() {
     private fun launchAddMode() {
         with(binding.btnDelete) {
             isEnabled = false
-            setTextColor(ColorStateList.valueOf(requireContext().getColor(R.color.gray)))
-            setIconTintResource(R.color.gray)
-            compoundDrawableTintList = ColorStateList.valueOf(
-                requireContext().getColor(R.color.gray)
-            )
+            val grayColor = MaterialColors.getColor(this, R.attr.disableLabelColor)
+            setTextColor(grayColor)
+//            iconTint = grayColor
+//            setIconTintResource(R.color.gray)
+            compoundDrawableTintList = ColorStateList.valueOf(grayColor)
         }
         binding.btnSave.setOnClickListener {
             saveTodoItem()
@@ -194,16 +197,11 @@ class TodoItemFragment : Fragment() {
                 this::saveTodoItem
             )
         }
-        val onSuccess = { onTodoItemEditingFinishedListener.onTodoItemEditingFinished() }
+        val onSuccess = { onTodoItemEditingFinished() }
         when (screenMode) {
             MODE_EDIT -> viewModel.editTodoItem(onError = onError, onSuccess = onSuccess)
             MODE_ADD -> viewModel.addTodoItem(onError = onError, onSuccess = onSuccess)
         }
-    }
-
-    interface OnTodoItemEditingFinishedListener {
-
-        fun onTodoItemEditingFinished()
     }
 
     companion object {

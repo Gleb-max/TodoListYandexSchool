@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="separatorSupportColor" format="reference|color" />
+    <attr name="overlaySupportColor" format="reference|color" />
+    <attr name="primaryLabelColor" format="reference|color" />
+    <attr name="secondaryLabelColor" format="reference|color" />
+    <attr name="tertiaryLabelColor" format="reference|color" />
+    <attr name="disableLabelColor" format="reference|color" />
+    <attr name="redColor" format="reference|color" />
+    <attr name="greenColor" format="reference|color" />
+    <attr name="blueColor" format="reference|color" />
+    <attr name="grayColor" format="reference|color" />
+    <attr name="lightGrayColor" format="reference|color" />
+    <attr name="whiteColor" format="reference|color" />
+    <attr name="primaryBackColor" format="reference|color" />
+    <attr name="secondaryBackColor" format="reference|color" />
+    <attr name="elevatedBackColor" format="reference|color" />
+</resources>

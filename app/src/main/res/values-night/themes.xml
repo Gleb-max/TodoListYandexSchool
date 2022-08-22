@@ -1,0 +1,26 @@
+<resources>
+    <!-- Base application theme. -->
+    <style name="Theme.TodoListYandexSchool" parent="Theme.MaterialComponents.NoActionBar">
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">?attr/primaryBackColor</item>
+        <item name="android:windowBackground">?attr/primaryBackColor</item>
+        <!-- Customize your theme here. -->
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="separatorSupportColor">@color/separator_dark</item>
+        <item name="overlaySupportColor">@color/overlay_dark</item>
+        <item name="primaryLabelColor">@color/white</item>
+        <item name="secondaryLabelColor">@color/label_secondary_dark</item>
+        <item name="tertiaryLabelColor">@color/label_tertiary_dark</item>
+        <item name="disableLabelColor">@color/label_disable_dark</item>
+        <item name="redColor">@color/red_dark</item>
+        <item name="greenColor">@color/green_dark</item>
+        <item name="blueColor">@color/blue_dark</item>
+        <item name="grayColor">@color/gray_dark</item>
+        <item name="lightGrayColor">@color/l_gray_dark</item>
+        <item name="whiteColor">@color/white</item>
+        <item name="primaryBackColor">@color/back_primary_dark</item>
+        <item name="secondaryBackColor">@color/back_secondary_dark</item>
+        <item name="elevatedBackColor">@color/back_elevated_dark</item>
+    </style>
+</resources>
