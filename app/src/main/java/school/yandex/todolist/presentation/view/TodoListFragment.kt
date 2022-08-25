@@ -56,7 +56,7 @@ class TodoListFragment : Fragment() {
     }
     private val networkCallback = object : ConnectivityManager.NetworkCallback() {
         override fun onAvailable(network: Network) {
-            viewModel.fetchTodoList()
+            viewModel.patchTodoList()
         }
     }
 
@@ -132,26 +132,27 @@ class TodoListFragment : Fragment() {
         viewModel.isLoading.observe(viewLifecycleOwner) {
             binding.swipeToRefresh.isRefreshing = it
         }
-        viewModel.currentTodoList.observe(viewLifecycleOwner) {
-            Log.e("currentTodoList", it.toString())
-            todoListAdapter.submitList(it)
+        viewModel.allTodoItems.observe(viewLifecycleOwner) {
+            val doneCount = it.count { item -> item.isDone }
+            binding.tvDoneCount.text = getString(R.string.items_done_subtitle, doneCount)
 
-            if (it.isEmpty()) {
+            val currentList =
+                if (viewModel.isAllItems.value!!) it else it.filter { todoItem -> !todoItem.isDone }
+            todoListAdapter.submitList(currentList)
+
+            if (currentList.isEmpty()) {
                 scaleAnimation.setTarget(binding.fab)
                 scaleAnimation.start()
             } else {
                 scaleAnimation.end()
             }
         }
-        viewModel.allTodoItems.observe(viewLifecycleOwner) {
-            Log.e("allTodoItems", it.toString())
-            val doneCount = it.count { item -> item.isDone }
-            binding.tvDoneCount.text = getString(R.string.items_done_subtitle, doneCount)
-        }
         viewModel.isAllItems.observe(viewLifecycleOwner) {
-            Log.e("isAllItems", it.toString())
             val imageResource = if (it) R.drawable.ic_visibility_off else R.drawable.ic_visibility
             binding.ibTodoVisibility.setImageResource(imageResource)
+
+            val currentList = if (it) viewModel.allTodoItems.value else viewModel.allTodoItems.value?.filter { todoItem -> !todoItem.isDone }
+            todoListAdapter.submitList(currentList)
         }
     }
 

@@ -1,5 +1,6 @@
 package school.yandex.todolist.data.source.local.db
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -9,7 +10,10 @@ import androidx.room.Query
 interface TodoListDao {
 
     @Query("SELECT * FROM todo_items")
-    fun getTodoList(): List<TodoItemDbModel>
+    fun getTodoList(): LiveData<List<TodoItemDbModel>>
+
+    @Query("SELECT * FROM todo_items")
+    fun getTodoListSync(): List<TodoItemDbModel>
 
     @Query("SELECT * FROM todo_items WHERE id=:todoItemId LIMIT 1")
     suspend fun getTodoItem(todoItemId: String): TodoItemDbModel

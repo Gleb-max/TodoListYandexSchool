@@ -5,13 +5,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import school.yandex.todolist.core.viewmodel.BaseViewModel
 import school.yandex.todolist.domain.entity.TodoItem
-import school.yandex.todolist.domain.usecase.DeleteTodoItemUseCase
-import school.yandex.todolist.domain.usecase.EditTodoItemUseCase
-import school.yandex.todolist.domain.usecase.GetTodoListUseCase
+import school.yandex.todolist.domain.usecase.*
 import javax.inject.Inject
 
 class TodoListViewModel @Inject constructor(
     private val getTodoListUseCase: GetTodoListUseCase,
+    private val loadTodoListUseCase: LoadTodoListUseCase,
+    private val patchTodoListUseCase: PatchTodoListUseCase,
     private val editTodoItemUseCase: EditTodoItemUseCase,
     private val deleteTodoItemUseCase: DeleteTodoItemUseCase,
 ) : BaseViewModel() {
@@ -25,23 +25,10 @@ class TodoListViewModel @Inject constructor(
     private val _isAllItems = MutableLiveData(false)
     val isAllItems: LiveData<Boolean> = _isAllItems
 
-    private val _allTodoItems = MutableLiveData<List<TodoItem>>(listOf())
-    val allTodoItems: LiveData<List<TodoItem>> = _allTodoItems
-
-    private val _currentTodoList = MutableLiveData<List<TodoItem>>(listOf())
-    val currentTodoList: LiveData<List<TodoItem>> = _currentTodoList
+    val allTodoItems = getTodoListUseCase()
 
     fun changeItemsVisibility() {
         _isAllItems.value = !isAllItems.value!!
-        applyFilters()
-    }
-
-    private fun applyFilters() {
-        _currentTodoList.postValue(if (_isAllItems.value!!) {
-            _allTodoItems.value
-        } else {
-            _allTodoItems.value!!.filter { !it.isDone }
-        })
     }
 
     fun fetchTodoList(
@@ -49,9 +36,13 @@ class TodoListViewModel @Inject constructor(
         onSuccess: (() -> Unit)? = null
     ) {
         viewModelScope.execute(onSuccess, onError) {
-            val todoList = getTodoListUseCase()
-            _allTodoItems.postValue(todoList)
-            applyFilters()
+            loadTodoListUseCase()
+        }
+    }
+
+    fun patchTodoList() {
+        viewModelScope.execute {
+            patchTodoListUseCase()
         }
     }
 

@@ -2,6 +2,7 @@ package school.yandex.todolist.data.source.remote.api
 
 import retrofit2.http.*
 import school.yandex.todolist.data.source.remote.model.request.TodoItemRequest
+import school.yandex.todolist.data.source.remote.model.request.TodoItemsRequest
 import school.yandex.todolist.data.source.remote.model.response.TodoItemResponse
 import school.yandex.todolist.data.source.remote.model.response.TodoListResponse
 
@@ -11,7 +12,7 @@ interface TodoApi {
     suspend fun fetchTodoList(): TodoListResponse
 
     @PATCH("list")
-    suspend fun patchTodoList(): TodoListResponse
+    suspend fun patchTodoList(@Body todoItemsBody: TodoItemsRequest): TodoListResponse
 
     @GET("list/{item_id}")
     suspend fun fetchTodoItem(@Path("item_id") todoItemId: String): TodoItemResponse

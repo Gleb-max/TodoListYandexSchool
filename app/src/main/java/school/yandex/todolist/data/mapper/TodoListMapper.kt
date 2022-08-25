@@ -55,4 +55,14 @@ class TodoListMapper @Inject constructor() {
         createdAt = todoItemDTO.createdAt,
         changedAt = todoItemDTO.changedAt,
     )
+
+    fun mapEntityToDbModel(todoItem: TodoItem) = TodoItemDbModel(
+        id = todoItem.id,
+        content = todoItem.content,
+        importance = todoItem.importance,
+        deadline = todoItem.deadline?.time,
+        isDone = todoItem.isDone,
+        createdAt = todoItem.createdAt.time,
+        changedAt = todoItem.changedAt?.time,
+    )
 }

@@ -1,22 +1,19 @@
 package school.yandex.todolist.data.worker
 
 import android.content.Context
-import android.util.Log
 import androidx.work.*
-import school.yandex.todolist.domain.usecase.GetTodoListUseCase
+import school.yandex.todolist.domain.usecase.LoadTodoListUseCase
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class TodoSyncWorker(
     context: Context,
     workerParameters: WorkerParameters,
-    private val getTodoListUseCase: GetTodoListUseCase
+    private val loadTodoListUseCase: LoadTodoListUseCase
 ) : CoroutineWorker(context, workerParameters) {
 
     override suspend fun doWork(): Result {
-        val todoItems = getTodoListUseCase()
-        //todo: добавить сохранение в рум
-        Log.d("todo list", todoItems.toString())
+        loadTodoListUseCase()
         return Result.success()
     }
 
@@ -40,7 +37,7 @@ class TodoSyncWorker(
     }
 
     class Factory @Inject constructor(
-        private val getTodoListUseCase: GetTodoListUseCase
+        private val loadTodoListUseCase: LoadTodoListUseCase
     ) : ChildWorkerFactory {
 
         override fun create(
@@ -50,7 +47,7 @@ class TodoSyncWorker(
             return TodoSyncWorker(
                 context,
                 workerParameters,
-                getTodoListUseCase
+                loadTodoListUseCase
             )
         }
     }
