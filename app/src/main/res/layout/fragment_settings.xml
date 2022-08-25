@@ -1,11 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    android:orientation="vertical"
+    android:padding="16dp"
     tools:context=".presentation.view.SettingsFragment">
 
+    <com.google.android.material.radiobutton.MaterialRadioButton
+        android:id="@+id/rb_light"
+        style="@style/TextAppearance.Title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:buttonTint="?attr/blueColor"
+        android:paddingHorizontal="8dp"
+        android:textColor="?attr/primaryLabelColor"
+        tools:text="Всегда светлая" />
 
-</LinearLayout>
+    <com.google.android.material.radiobutton.MaterialRadioButton
+        android:id="@+id/rb_dark"
+        style="@style/TextAppearance.Title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:buttonTint="?attr/blueColor"
+        android:paddingHorizontal="8dp"
+        android:textColor="?attr/primaryLabelColor"
+        tools:text="Всегда темная" />
+
+    <com.google.android.material.radiobutton.MaterialRadioButton
+        android:id="@+id/rb_system"
+        style="@style/TextAppearance.Title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:buttonTint="?attr/blueColor"
+        android:paddingHorizontal="8dp"
+        android:textColor="?attr/primaryLabelColor"
+        tools:text="Как в системе" />
+</RadioGroup>

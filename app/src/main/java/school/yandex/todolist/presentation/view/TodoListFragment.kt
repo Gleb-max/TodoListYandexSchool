@@ -92,6 +92,9 @@ class TodoListFragment : Fragment() {
             ibTodoVisibility.setOnClickListener {
                 viewModel.changeItemsVisibility()
             }
+            ibSettings.setOnClickListener {
+                onOpenSettings()
+            }
         }
 
         setupAppBar()
@@ -118,6 +121,10 @@ class TodoListFragment : Fragment() {
 
     private fun onAddTodoItem() {
         findNavController().navigate(R.id.navigation_todo_item_details)
+    }
+
+    private fun onOpenSettings() {
+        findNavController().navigate(R.id.navigation_settings)
     }
 
     private fun observeViewModel() {

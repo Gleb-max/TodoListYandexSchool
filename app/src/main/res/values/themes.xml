@@ -1,6 +1,10 @@
 <resources>
     <!-- Base application theme. -->
     <style name="Theme.TodoListYandexSchool" parent="Theme.MaterialComponents.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">?attr/blueColor</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">?attr/blueColor</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/primaryBackColor</item>
         <item name="android:windowBackground">?attr/primaryBackColor</item>

@@ -7,6 +7,12 @@
         <item>Высокий</item>
     </string-array>
 
+    <string-array name="theme_variants">
+        <item>Всегда светлая</item>
+        <item>Всегда тёмная</item>
+        <item>Как в системе</item>
+    </string-array>
+
     <string name="add_todo_item_content_description">Add Todo Item</string>
 
     // titles
@@ -32,4 +38,6 @@
     //errors
     <string name="error_yandex_auth">Произошла ошибка. Повторите попытку позже.</string>
     <string name="add_todo_item_text">Новое</string>
+    <string name="todo_item_hint">Что надо сделать…</string>
+    <string name="make_to">Сделать до</string>
 </resources>

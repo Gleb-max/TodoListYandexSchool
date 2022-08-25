@@ -79,19 +79,17 @@ dependencies {
     // work manager
     implementation "androidx.work:work-runtime-ktx:$work_manager_version"
 
-    // Dagger todo: перейти на него
     implementation 'com.google.dagger:dagger:2.35.1'
     kapt 'com.google.dagger:dagger-compiler:2.35.1'
-
-    // Koin
-//    implementation "io.insert-koin:koin-android:$koin_version"
-//    implementation "io.insert-koin:koin-androidx-compose:$koin_version"
 
     // yandex auth
     implementation "com.yandex.android:authsdk:$yandex_auth_version"
 
     // jwt
     implementation "com.auth0.android:jwtdecode:$jwt_version"
+
+    // lottie animations
+    implementation "com.airbnb.android:lottie:$lottie_version"
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

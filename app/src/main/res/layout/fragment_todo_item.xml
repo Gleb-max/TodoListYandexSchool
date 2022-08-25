@@ -21,13 +21,12 @@
             android:layout_height="match_parent"
             android:background="?attr/primaryBackColor"
             android:fitsSystemWindows="true"
-            android:paddingBottom="16dp"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="32dp"
                 android:paddingHorizontal="16dp">
 
                 <androidx.appcompat.widget.AppCompatImageButton
@@ -80,26 +79,40 @@
 
             <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/et_content"
+                style="@style/TextAppearance.Title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_margin="4dp"
                 android:background="@drawable/input_area_bg"
+                android:elevation="4dp"
+                android:hint="@string/todo_item_hint"
                 android:inputType="text|textMultiLine"
                 android:minHeight="104dp"
-                android:padding="8dp" />
+                android:padding="8dp"
+                android:textColor="?attr/primaryLabelColor"
+                android:textColorHint="?attr/tertiaryLabelColor"
+                tools:text="@tools:sample/lorem" />
 
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:hint="@string/importance"
-                app:boxStrokeWidth="0dp">
+                app:boxBackgroundColor="?attr/lightGrayColor"
+                app:boxStrokeWidth="0dp"
+                app:hintEnabled="false"
+                app:hintTextColor="?attr/primaryLabelColor">
 
                 <AutoCompleteTextView
                     android:id="@+id/dropdown_importance"
+                    style="@style/TextAppearance.Title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="none" />
+                    android:hint="@string/importance"
+                    android:inputType="none"
+                    android:textColor="?attr/primaryLabelColor"
+                    android:textColorHint="?attr/primaryLabelColor"
+                    tools:text="@tools:sample/lorem" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -108,15 +121,22 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:hint="Сделать до"
-                app:boxStrokeWidth="0dp">
+                app:boxBackgroundColor="?attr/lightGrayColor"
+                app:boxStrokeWidth="0dp"
+                app:hintEnabled="false"
+                app:hintTextColor="?attr/primaryLabelColor">
 
                 <AutoCompleteTextView
                     android:id="@+id/tl_date"
+                    style="@style/TextAppearance.Title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:enabled="true"
-                    android:inputType="none" />
+                    android:hint="@string/make_to"
+                    android:inputType="none"
+                    android:textColor="?attr/primaryLabelColor"
+                    android:textColorHint="?attr/primaryLabelColor"
+                    tools:text="@tools:sample/lorem" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
