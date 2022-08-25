@@ -3,6 +3,7 @@ package school.yandex.todolist.presentation.stateholder
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import school.yandex.todolist.core.viewmodel.BaseViewModel
 import school.yandex.todolist.domain.entity.TodoItem
 import school.yandex.todolist.domain.usecase.*
@@ -26,6 +27,12 @@ class TodoListViewModel @Inject constructor(
     val isAllItems: LiveData<Boolean> = _isAllItems
 
     val allTodoItems = getTodoListUseCase()
+
+    init {
+        viewModelScope.execute {
+            patchTodoListUseCase()
+        }
+    }
 
     fun changeItemsVisibility() {
         _isAllItems.value = !isAllItems.value!!

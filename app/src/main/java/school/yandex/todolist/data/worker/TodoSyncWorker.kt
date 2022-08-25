@@ -3,17 +3,18 @@ package school.yandex.todolist.data.worker
 import android.content.Context
 import androidx.work.*
 import school.yandex.todolist.domain.usecase.LoadTodoListUseCase
+import school.yandex.todolist.domain.usecase.PatchTodoListUseCase
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class TodoSyncWorker(
     context: Context,
     workerParameters: WorkerParameters,
-    private val loadTodoListUseCase: LoadTodoListUseCase
+    private val patchTodoListUseCase: PatchTodoListUseCase
 ) : CoroutineWorker(context, workerParameters) {
 
     override suspend fun doWork(): Result {
-        loadTodoListUseCase()
+        patchTodoListUseCase()
         return Result.success()
     }
 
@@ -37,7 +38,7 @@ class TodoSyncWorker(
     }
 
     class Factory @Inject constructor(
-        private val loadTodoListUseCase: LoadTodoListUseCase
+        private val patchTodoListUseCase: PatchTodoListUseCase
     ) : ChildWorkerFactory {
 
         override fun create(
@@ -47,7 +48,7 @@ class TodoSyncWorker(
             return TodoSyncWorker(
                 context,
                 workerParameters,
-                loadTodoListUseCase
+                patchTodoListUseCase
             )
         }
     }
