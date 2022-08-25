@@ -8,23 +8,24 @@ import javax.inject.Inject
 
 class TodoListMapper @Inject constructor() {
 
-    //todo: добавить инициализацию полей color и lastUpdatedBy
     fun mapEntityToDTO(todoItem: TodoItem) = TodoItemDTO(
         id = todoItem.id,
         text = todoItem.content,
         importance = todoItem.importance.name.lowercase(),
-        deadline = todoItem.deadline?.time,
+        deadline = todoItem.deadline?.time?.div(1000),
         isDone = todoItem.isDone,
-        color = null,
-        createdAt = todoItem.createdAt.time,
-        changedAt = todoItem.changedAt?.time,
-        lastUpdatedBy = "",
+        color = "#FFFFFF",
+        createdAt = todoItem.createdAt.time / 1000,
+        changedAt = todoItem.changedAt?.time?.div(1000),
+        lastUpdatedBy = "gleb",
     )
 
     fun mapDTOToEntity(todoItemDTO: TodoItemDTO) = TodoItem(
-        id = todoItemDTO.id,
+        id = todoItemDTO.id!!,
         content = todoItemDTO.text,
-        importance = TodoItemImportance.valueOf(todoItemDTO.importance),
+        importance = TodoItemImportance.values().firstOrNull {
+            it.value == todoItemDTO.importance
+        } ?: TodoItemImportance.BASIC,
         deadline = todoItemDTO.deadline?.let { Date(it) },
         isDone = todoItemDTO.isDone,
         createdAt = Date(todoItemDTO.createdAt),

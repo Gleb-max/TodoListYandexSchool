@@ -3,7 +3,7 @@ package school.yandex.todolist.data.source.remote.model
 import com.google.gson.annotations.SerializedName
 
 data class TodoItemDTO(
-    @SerializedName("id") val id: String,
+    @SerializedName("id") val id: String?,
     @SerializedName("text") val text: String,
     @SerializedName("importance") val importance: String,
     @SerializedName("deadline") val deadline: Long?,

@@ -24,15 +24,18 @@ data class TodoItemDraft(
         return deadline?.let { formatter.format(it) }
     }
 
-    fun toEntity() = TodoItem(
-        id = this.id ?: TodoItem.UNDEFINED_ID,
-        content = this.content,
-        importance = this.importance,
-        deadline = this.deadline,
-        isDone = this.isDone,
-        createdAt = this.createdAt ?: Date(),
-        changedAt = this.changedAt,
-    )
+    fun toEntity(): TodoItem {
+        val createdAt = this.createdAt ?: Date()
+        return TodoItem(
+            id = this.id ?: TodoItem.UNDEFINED_ID,
+            content = this.content,
+            importance = this.importance,
+            deadline = this.deadline,
+            isDone = this.isDone,
+            createdAt = createdAt,
+            changedAt = this.changedAt ?: createdAt,
+        )
+    }
 
     companion object {
 

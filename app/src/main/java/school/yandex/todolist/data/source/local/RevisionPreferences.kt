@@ -1,10 +1,12 @@
 package school.yandex.todolist.data.source.local
 
+import android.app.Application
 import android.content.Context
+import javax.inject.Inject
 
 
 //todo save in room
-class RevisionPreferences(context: Context) {
+class RevisionPreferences @Inject constructor(context: Application) {
     // todo: можно подумать, что тут может случиться утечка контекста,
     //  но из di тут всегда будет application, поэтому придумать как сделать чище это место
     private val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)

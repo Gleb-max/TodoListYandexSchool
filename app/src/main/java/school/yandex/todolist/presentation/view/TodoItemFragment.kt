@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -23,6 +24,7 @@ import school.yandex.todolist.TodoApp
 import school.yandex.todolist.core.ext.getReadableDate
 import school.yandex.todolist.databinding.FragmentTodoItemBinding
 import school.yandex.todolist.domain.entity.TodoItem
+import school.yandex.todolist.domain.entity.TodoItemImportance
 import school.yandex.todolist.presentation.i.OnSnackBarShowListener
 import school.yandex.todolist.presentation.stateholder.TodoItemViewModel
 import school.yandex.todolist.presentation.stateholder.ViewModelFactory
@@ -72,6 +74,7 @@ class TodoItemFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        //todo передавать todo item id во вью модель через фабрику. Убрать логику работы с id из фрагмента
         viewModel = ViewModelProvider(this, viewModelFactory)[TodoItemViewModel::class.java]
         observeViewModel()
 
@@ -80,10 +83,12 @@ class TodoItemFragment : Fragment() {
         binding.ibClose.setOnClickListener {
             onTodoItemEditingFinished()
         }
-
         binding.btnDelete.setOnClickListener {
             viewModel.deleteTodoItem(todoItemId)
             onTodoItemEditingFinished()
+        }
+        binding.etContent.doOnTextChanged { text, _, _, _ ->
+            text?.let { viewModel.updateDraft(content = it.toString()) }
         }
         setupImportanceSelector()
         setupDatePicker()
@@ -99,7 +104,6 @@ class TodoItemFragment : Fragment() {
     }
 
     private fun setupImportanceSelector() {
-        //todo add custom adapter for collect selected item
         binding.dropdownImportance.setAdapter(
             ArrayAdapter(
                 requireContext(),
@@ -109,6 +113,15 @@ class TodoItemFragment : Fragment() {
                 )
             )
         )
+        binding.dropdownImportance.setOnItemClickListener { adapterView, view, i, l ->
+            val importance = when (i) {
+                1 -> TodoItemImportance.BASIC
+                2 -> TodoItemImportance.LOW
+                3 -> TodoItemImportance.IMPORTANT
+                else -> null
+            }
+            viewModel.updateDraft(importance = importance)
+        }
     }
 
     private fun setupDatePicker() {
@@ -137,9 +150,10 @@ class TodoItemFragment : Fragment() {
     private fun observeViewModel() {
         viewModel.todoItemDraft.observe(viewLifecycleOwner) {
             if (it != null) {
-                binding.etContent.setText(it.content)
+                if (binding.etContent.text == null && it.content.isNotBlank()) {
+                    binding.etContent.setText(it.content)
+                }
                 binding.tlDate.setText(it.deadline?.getReadableDate())
-                //todo
             }
         }
     }

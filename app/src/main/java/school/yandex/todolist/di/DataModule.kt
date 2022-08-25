@@ -11,8 +11,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import school.yandex.todolist.data.repository.TodoItemsRepositoryImpl
 import school.yandex.todolist.data.repository.UsersRepositoryImpl
-import school.yandex.todolist.data.source.local.RevisionPreferences
-import school.yandex.todolist.data.source.local.UserPreferences
+import school.yandex.todolist.data.source.local.db.AppDatabase
 import school.yandex.todolist.data.source.remote.api.TodoApi
 import school.yandex.todolist.data.source.remote.interceptor.AuthHeaderInterceptor
 import school.yandex.todolist.data.source.remote.interceptor.LastRevisionInterceptor
@@ -39,39 +38,9 @@ interface DataModule {
 
         @Provides
         @ApplicationScope
-        fun provideUserPreferences(application: Application): UserPreferences {
-            return UserPreferences(application)
-        }
-
-        @Provides
-        @ApplicationScope
-        fun provideRevisionPreferences(application: Application): RevisionPreferences {
-            return RevisionPreferences(application)
-        }
-
-        @Provides
-        @ApplicationScope
-        fun provideAuthHeaderInterceptor(): AuthHeaderInterceptor {
-            return AuthHeaderInterceptor()
-        }
-
-        @Provides
-        @ApplicationScope
-        fun provideLastRevisionInterceptor(revisionPreferences: RevisionPreferences): LastRevisionInterceptor {
-            return LastRevisionInterceptor(revisionPreferences)
-        }
-
-        @Provides
-        @ApplicationScope
-        fun provideRetryInterceptor(): RetryInterceptor {
-            return RetryInterceptor()
-        }
-
-        @Provides
-        @ApplicationScope
         fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor {
             return HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.BASIC
+                level = HttpLoggingInterceptor.Level.BODY
             }
         }
 
@@ -122,6 +91,12 @@ interface DataModule {
         @ApplicationScope
         fun provideTodoApi(retrofit: Retrofit): TodoApi {
             return retrofit.create(TodoApi::class.java)
+        }
+
+        @Provides
+        @ApplicationScope
+        fun provideAppDataBase(application: Application): AppDatabase {
+            return AppDatabase.getInstance(application)
         }
     }
 }

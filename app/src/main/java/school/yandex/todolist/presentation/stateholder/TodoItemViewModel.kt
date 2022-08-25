@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import school.yandex.todolist.core.viewmodel.BaseViewModel
-import school.yandex.todolist.domain.entity.TodoItem
 import school.yandex.todolist.domain.entity.TodoItemImportance
 import school.yandex.todolist.domain.usecase.AddTodoItemUseCase
 import school.yandex.todolist.domain.usecase.DeleteTodoItemUseCase
@@ -67,16 +66,7 @@ class TodoItemViewModel @Inject constructor(
             //todo: возможно кидать здесь какую-нибудь ошибку если null
             val draftTodoItem = todoItemDraft.value ?: return@execute
             addTodoItemUseCase(
-                //todo: переписать здесь также на мапперы как в data слое маппер entityToDTO
-                TodoItem(
-                    draftTodoItem.id ?: TodoItem.UNDEFINED_ID,
-                    draftTodoItem.content,
-                    draftTodoItem.importance,
-                    draftTodoItem.deadline,
-                    draftTodoItem.isDone,
-                    draftTodoItem.createdAt ?: Calendar.getInstance().time,
-                    draftTodoItem.changedAt
-                )
+                draftTodoItem.toEntity()
             )
         }
     }
@@ -89,16 +79,7 @@ class TodoItemViewModel @Inject constructor(
             //todo: возможно кидать здесь какую-нибудь ошибку если null
             val draftTodoItem = todoItemDraft.value ?: return@execute
             editTodoItemUseCase(
-                //todo: переписать здесь также на мапперы как в data слое маппер entityToDTO
-                TodoItem(
-                    draftTodoItem.id ?: TodoItem.UNDEFINED_ID,
-                    draftTodoItem.content,
-                    draftTodoItem.importance,
-                    draftTodoItem.deadline,
-                    draftTodoItem.isDone,
-                    draftTodoItem.createdAt ?: Calendar.getInstance().time,
-                    draftTodoItem.changedAt
-                )
+                draftTodoItem.toEntity()
             )
         }
     }
