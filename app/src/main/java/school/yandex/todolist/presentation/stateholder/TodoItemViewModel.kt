@@ -44,7 +44,7 @@ class TodoItemViewModel @Inject constructor(
     ) {
         viewModelScope.execute(onSuccess, onError) {
             val item = getTodoItemUseCase(todoItemId)
-            _todoItemDraft.value = TodoItemDraft.fromEntity(item)
+            _todoItemDraft.postValue(TodoItemDraft.fromEntity(item))
         }
     }
 

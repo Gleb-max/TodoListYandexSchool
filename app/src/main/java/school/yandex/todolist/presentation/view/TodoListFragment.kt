@@ -5,6 +5,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -131,7 +132,8 @@ class TodoListFragment : Fragment() {
         viewModel.isLoading.observe(viewLifecycleOwner) {
             binding.swipeToRefresh.isRefreshing = it
         }
-        viewModel.todoList.observe(viewLifecycleOwner) {
+        viewModel.currentTodoList.observe(viewLifecycleOwner) {
+            Log.e("currentTodoList", it.toString())
             todoListAdapter.submitList(it)
 
             if (it.isEmpty()) {
@@ -142,10 +144,12 @@ class TodoListFragment : Fragment() {
             }
         }
         viewModel.allTodoItems.observe(viewLifecycleOwner) {
+            Log.e("allTodoItems", it.toString())
             val doneCount = it.count { item -> item.isDone }
             binding.tvDoneCount.text = getString(R.string.items_done_subtitle, doneCount)
         }
         viewModel.isAllItems.observe(viewLifecycleOwner) {
+            Log.e("isAllItems", it.toString())
             val imageResource = if (it) R.drawable.ic_visibility_off else R.drawable.ic_visibility
             binding.ibTodoVisibility.setImageResource(imageResource)
         }

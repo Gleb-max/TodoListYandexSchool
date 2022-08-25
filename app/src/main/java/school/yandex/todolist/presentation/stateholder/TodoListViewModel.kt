@@ -28,8 +28,8 @@ class TodoListViewModel @Inject constructor(
     private val _allTodoItems = MutableLiveData<List<TodoItem>>(listOf())
     val allTodoItems: LiveData<List<TodoItem>> = _allTodoItems
 
-    private val _todoList = MutableLiveData<List<TodoItem>>(listOf())
-    val todoList: LiveData<List<TodoItem>> = _todoList
+    private val _currentTodoList = MutableLiveData<List<TodoItem>>(listOf())
+    val currentTodoList: LiveData<List<TodoItem>> = _currentTodoList
 
     fun changeItemsVisibility() {
         _isAllItems.value = !isAllItems.value!!
@@ -37,7 +37,7 @@ class TodoListViewModel @Inject constructor(
     }
 
     private fun applyFilters() {
-        _todoList.postValue(if (_isAllItems.value!!) {
+        _currentTodoList.postValue(if (_isAllItems.value!!) {
             _allTodoItems.value
         } else {
             _allTodoItems.value!!.filter { !it.isDone }

@@ -11,8 +11,8 @@ data class TodoItemDbModel(
     val id: String,
     val content: String,
     val importance: TodoItemImportance,
-    val deadline: Int?,
+    val deadline: Long?,
     val isDone: Boolean,
-    val createdAt: Int,
-    val changedAt: Int?,
+    val createdAt: Long,
+    val changedAt: Long?,
 )

@@ -5,4 +5,5 @@ import school.yandex.todolist.data.source.remote.model.TodoItemDTO
 
 class TodoItemRequest(
     @SerializedName("element") val todo: TodoItemDTO,
+    @SerializedName("status") val status: String = "ok",
 )

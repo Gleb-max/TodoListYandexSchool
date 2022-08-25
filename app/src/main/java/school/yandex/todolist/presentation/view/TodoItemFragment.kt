@@ -150,7 +150,7 @@ class TodoItemFragment : Fragment() {
     private fun observeViewModel() {
         viewModel.todoItemDraft.observe(viewLifecycleOwner) {
             if (it != null) {
-                if (binding.etContent.text == null && it.content.isNotBlank()) {
+                if (binding.etContent.text.isNullOrBlank() && it.content.isNotBlank()) {
                     binding.etContent.setText(it.content)
                 }
                 binding.tlDate.setText(it.deadline?.getReadableDate())

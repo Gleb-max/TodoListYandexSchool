@@ -2,24 +2,35 @@ package school.yandex.todolist.data.repository
 
 import school.yandex.todolist.data.mapper.TodoListMapper
 import school.yandex.todolist.data.source.local.RevisionPreferences
+import school.yandex.todolist.data.source.local.db.TodoListDao
 import school.yandex.todolist.data.source.remote.api.TodoApi
 import school.yandex.todolist.data.source.remote.model.request.TodoItemRequest
 import school.yandex.todolist.domain.entity.TodoItem
 import school.yandex.todolist.domain.repository.TodoItemsRepository
 import javax.inject.Inject
+import kotlin.random.Random
 
-//todo: add local data source to constructor
 class TodoItemsRepositoryImpl @Inject constructor(
     private val remote: TodoApi,
+    private val local: TodoListDao,
     private val revisionPreferences: RevisionPreferences,
     private val mapper: TodoListMapper
 ) : TodoItemsRepository {
 
     override suspend fun getTodoList(): List<TodoItem> {
-        val todoListResponse = remote.fetchTodoList()
-        val lastRevision = todoListResponse.revision
-        revisionPreferences.setRevision(lastRevision)
-        return mapper.mapListDTOToListEntity(todoListResponse.todoItems)
+        try {
+            val todoListResponse = remote.fetchTodoList()
+            val lastRevision = todoListResponse.revision
+            revisionPreferences.setRevision(lastRevision)
+            local.addTodoItems(todoListResponse.todoItems.map {
+                mapper.mapDTOToDbModel(it)
+            })
+        } catch (exc: Exception) {
+            //todo: add handling errors
+        }
+        return local.getTodoList().map {
+            mapper.mapDbModelToEntity(it)
+        }
     }
 
     override suspend fun getTodoItem(todoItemId: String): TodoItem {
@@ -30,7 +41,8 @@ class TodoItemsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun addTodoItem(todoItem: TodoItem) {
-        val req = TodoItemRequest(mapper.mapEntityToDTO(todoItem))
+        val t = todoItem.copy(id = generateTodoItemId())
+        val req = TodoItemRequest(mapper.mapEntityToDTO(t))
         remote.createTodoItem(req)
     }
 
@@ -42,4 +54,8 @@ class TodoItemsRepositoryImpl @Inject constructor(
     override suspend fun deleteTodoItem(todoItemId: String) {
         remote.deleteTodoItem(todoItemId)
     }
+
+    private fun generateTodoItemId() = Random(
+        System.currentTimeMillis()
+    ).nextInt(0, 100000).toString()
 }
