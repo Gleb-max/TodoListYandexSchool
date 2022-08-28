@@ -1,9 +1,8 @@
 package school.yandex.todolist.core.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 abstract class BaseViewModel : ViewModel() {
 
@@ -12,16 +11,28 @@ abstract class BaseViewModel : ViewModel() {
         onError: (() -> Unit)? = null,
         function: suspend () -> Unit,
     ) {
-        launch(Dispatchers.Main) {
+        launch(Dispatchers.IO) {
             runCatching {
                 function()
             }
                 .onSuccess {
-                    onSuccess?.invoke()
+                    withContext(Dispatchers.Main) {
+                        try {
+                            onSuccess?.invoke()
+                        } catch (exc: Exception) {
+                            exc.printStackTrace()
+                        }
+                    }
                 }
                 .onFailure { error ->
                     error.printStackTrace()
-                    onError?.invoke()
+                    withContext(Dispatchers.Main) {
+                        try {
+                            onError?.invoke()
+                        } catch (exc: Exception) {
+                            exc.printStackTrace()
+                        }
+                    }
                 }
         }
     }
