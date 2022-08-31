@@ -26,11 +26,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '11'
     }
     buildFeatures {
         viewBinding true
@@ -40,12 +40,15 @@ android {
             outputFileName = "todolist-${variant.buildType.name}-${defaultConfig.versionName}.apk"
         }
     }
+    buildTypes.each {
+        it.buildConfigField 'String', 'YANDEX_APP_METRICA', YANDEX_APP_METRICA
+    }
 }
 
 dependencies {
 
-    implementation "androidx.core:core-ktx:1.8.0"
-    implementation "androidx.appcompat:appcompat:1.4.2"
+    implementation "androidx.core:core-ktx:$android_core_version"
+    implementation "androidx.appcompat:appcompat:$app_compat_version"
 
     // Material
     implementation "com.google.android.material:material:$material_design_version"
@@ -84,8 +87,9 @@ dependencies {
     // work manager
     implementation "androidx.work:work-runtime-ktx:$work_manager_version"
 
-    implementation 'com.google.dagger:dagger:2.35.1'
-    kapt 'com.google.dagger:dagger-compiler:2.35.1'
+    // dagger
+    implementation "com.google.dagger:dagger:$dagger_version"
+    kapt "com.google.dagger:dagger-compiler:$dagger_version"
 
     // yandex auth
     implementation "com.yandex.android:authsdk:$yandex_auth_version"
@@ -95,6 +99,9 @@ dependencies {
 
     // lottie animations
     implementation "com.airbnb.android:lottie:$lottie_version"
+
+    // yandex app metrica
+    implementation "com.yandex.android:mobmetricalib:$yandex_app_metrica_version"
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

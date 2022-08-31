@@ -132,7 +132,7 @@ class TodoListFragment : Fragment() {
         viewModel.isLoading.observe(viewLifecycleOwner) {
             binding.swipeToRefresh.isRefreshing = it
         }
-        viewModel.allTodoItems.observe(viewLifecycleOwner) {
+        viewModel.todoItems.observe(viewLifecycleOwner) {
             val doneCount = it.count { item -> item.isDone }
             binding.tvDoneCount.text = getString(R.string.items_done_subtitle, doneCount)
 
@@ -151,7 +151,7 @@ class TodoListFragment : Fragment() {
             val imageResource = if (it) R.drawable.ic_visibility_off else R.drawable.ic_visibility
             binding.ibTodoVisibility.setImageResource(imageResource)
 
-            val currentList = if (it) viewModel.allTodoItems.value else viewModel.allTodoItems.value?.filter { todoItem -> !todoItem.isDone }
+            val currentList = if (it) viewModel.todoItems.value else viewModel.todoItems.value?.filter { todoItem -> !todoItem.isDone }
             todoListAdapter.submitList(currentList)
         }
     }

@@ -67,6 +67,7 @@ class TodoItemsRepositoryImpl @Inject constructor(
             val req = TodoItemRequest(mapper.mapEntityToDTO(t))
             remote.createTodoItem(req)
         } catch (exc: Exception) {
+            exc.printStackTrace()
             //todo: add handling errors
         }
     }
@@ -77,6 +78,7 @@ class TodoItemsRepositoryImpl @Inject constructor(
             val req = TodoItemRequest(mapper.mapEntityToDTO(todoItem))
             remote.editTodoItem(todoItem.id, req)
         } catch (exc: Exception) {
+            exc.printStackTrace()
             //todo: add handling errors
         }
     }
@@ -86,6 +88,7 @@ class TodoItemsRepositoryImpl @Inject constructor(
         try {
             remote.deleteTodoItem(todoItemId)
         } catch (exc: Exception) {
+            exc.printStackTrace()
             //todo: add handling errors
         }
     }
