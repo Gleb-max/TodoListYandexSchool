@@ -14,11 +14,11 @@ class TodoListMapper @Inject constructor() {
         id = todoItem.id,
         text = todoItem.content,
         importance = todoItem.importance.name.lowercase(),
-        deadline = todoItem.deadline?.time?.div(1000),
+        deadline = todoItem.deadline?.time,
         isDone = todoItem.isDone,
         color = "#FFFFFF",
-        createdAt = todoItem.createdAt.time / 1000,
-        changedAt = todoItem.changedAt?.time?.div(1000),
+        createdAt = todoItem.createdAt.time,
+        changedAt = todoItem.changedAt?.time,
         lastUpdatedBy = Build.DEVICE,
     )
 

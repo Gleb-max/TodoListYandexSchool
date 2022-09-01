@@ -115,9 +115,9 @@ class TodoItemFragment : Fragment() {
         )
         binding.dropdownImportance.setOnItemClickListener { adapterView, view, i, l ->
             val importance = when (i) {
-                1 -> TodoItemImportance.BASIC
-                2 -> TodoItemImportance.LOW
-                3 -> TodoItemImportance.IMPORTANT
+                0 -> TodoItemImportance.BASIC
+                1 -> TodoItemImportance.LOW
+                2 -> TodoItemImportance.IMPORTANT
                 else -> null
             }
             viewModel.updateDraft(importance = importance)
@@ -136,10 +136,8 @@ class TodoItemFragment : Fragment() {
                 .build()
 
             picker.addOnPositiveButtonClickListener {
-                val timeZoneUTC = TimeZone.getDefault()
-                val offsetFromUTC = timeZoneUTC.getOffset(Date().time) * -1
-
-                val date = Date(it + offsetFromUTC)
+                // todo учитывать часовой пояс
+                val date = Date(it)
                 viewModel.updateDraft(deadline = date)
             }
 
@@ -154,6 +152,14 @@ class TodoItemFragment : Fragment() {
                     binding.etContent.setText(it.content)
                 }
                 binding.tlDate.setText(it.deadline?.getReadableDate())
+                binding.dropdownImportance.apply {
+                    val importanceItemId = when (it.importance) {
+                        TodoItemImportance.BASIC -> 0
+                        TodoItemImportance.LOW -> 1
+                        TodoItemImportance.IMPORTANT -> 2
+                    }
+                    setText(adapter.getItem(importanceItemId).toString(), false)
+                }
             }
         }
     }

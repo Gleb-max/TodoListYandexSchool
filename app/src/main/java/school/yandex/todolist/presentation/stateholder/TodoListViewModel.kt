@@ -26,7 +26,7 @@ class TodoListViewModel @Inject constructor(
     private val _isAllItems = MutableLiveData(false)
     val isAllItems: LiveData<Boolean> = _isAllItems
 
-    val allTodoItems = getTodoListUseCase()
+    val todoItems = getTodoListUseCase()
 
     init {
         viewModelScope.execute {
